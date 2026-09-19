@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
+    "@vitejs/plugin-react": "^4.3.4",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
