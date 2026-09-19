@@ -1,0 +1,6 @@
+import { MapPin, Navigation } from 'lucide-react'; import { useMemo, useState } from 'react'; import type { Place } from '../types'
+export default function PlacePicker({label,value,places,onChange,type}:{label:string;value?:Place;places:Place[];onChange:(p:Place)=>void;type:'from'|'to'}) {
+ const [open,setOpen]=useState(false),[query,setQuery]=useState(''); const filtered=useMemo(()=>places.filter(p=>(p.name+p.description+p.category).toLowerCase().includes(query.toLowerCase())).slice(0,6),[places,query])
+ return <div className="picker"><label>{label}</label><button className="place-input" onClick={()=>setOpen(!open)}><span className={`place-dot ${type}`}>{type==='from'?<Navigation/>:<MapPin/>}</span><span><b>{value?.name||'Choisir un lieu'}</b><small>{value?.description||'Rechercher à Saint-Barth'}</small></span><span className="edit">Modifier</span></button>
+ {open&&<div className="dropdown"><input autoFocus placeholder="Nom, plage, hôtel, villa…" value={query} onChange={e=>setQuery(e.target.value)}/>{filtered.map(p=><button key={p.id} onClick={()=>{onChange(p);setOpen(false);setQuery('')}}><MapPin/><span><b>{p.name}</b><small>{p.category} · {p.description}</small></span></button>)}</div>}</div>
+}
