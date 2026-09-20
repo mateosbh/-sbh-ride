@@ -48,8 +48,8 @@ async function nominatim(q:string,limit='20'){
 
 export default function PlacePicker({label,value,places,onChange,type}:{label:string;value?:Place;places:Place[];onChange:(p:Place)=>void;type:'from'|'to'}){
  const[open,setOpen]=useState(false),[query,setQuery]=useState(''),[online,setOnline]=useState<Place[]>([]),[catalog,setCatalog]=useState<Place[]>([]),[loading,setLoading]=useState(false),[searched,setSearched]=useState(false),[error,setError]=useState('');useEffect(()=>{loadCatalog().then(setCatalog).catch(()=>{})},[])
- const local=useMemo(()=>{const q=query.toLowerCase().trim();return q?[...places,...catalog].filter(p=>(p.name+' '+p.description+' '+p.category).toLowerCase().includes(q)).slice(0,12):[...places,...catalog].slice(0,12)},[places,catalog,query])
- const results=useMemo(()=>{const seen=new Set<string>();return[...local,...online].filter(p=>{const k=p.name.toLowerCase()+'|'+p.lat.toFixed(4)+'|'+p.lng.toFixed(4);if(seen.has(k))return false;seen.add(k);return true}).slice(0,20)},[local,online])
+ const local=useMemo(()=>{const q=query.toLowerCase().trim();return q?[...catalog,...places].filter(p=>(p.name+' '+p.description+' '+p.category).toLowerCase().includes(q)).slice(0,12):[...catalog,...places].slice(0,12)},[places,catalog,query])
+ const results=useMemo(()=>{const seen=new Set<string>();return[...online,...local].filter(p=>{const k=p.name.toLowerCase()+'|'+p.lat.toFixed(4)+'|'+p.lng.toFixed(4);if(seen.has(k))return false;seen.add(k);return true}).slice(0,20)},[local,online])
 
  async function searchOnline(){
   const q=query.trim();if(q.length<2)return
