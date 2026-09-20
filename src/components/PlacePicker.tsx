@@ -4,7 +4,7 @@ import type { Place, PlaceCategory } from '../types'
 
 type OSMResult={place_id:number;display_name:string;name?:string;lat:string;lon:string;type?:string;class?:string;namedetails?:Record<string,string>;address?:Record<string,string>}
 const cache=new Map<string,Place[]>()
-const SBH_BOX='-62.89,17.87,-62.78,17.99'
+const SBH_BOX='-62.891,17.873,-62.779,17.974'
 
 function categoryFor(r:OSMResult):PlaceCategory{
  const t=(r.type||'').toLowerCase(),c=(r.class||'').toLowerCase()
@@ -50,7 +50,7 @@ export default function PlacePicker({label,value,places,onChange,type}:{label:st
     const more=await nominatim(`${q}, Saint-Barthélemy`)
     const ids=new Set(data.map(x=>x.place_id));data=[...data,...more.filter(x=>!ids.has(x.place_id))]
    }
-   const mapped=data.map(r=>mapResult(r,q)).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng))
+   const mapped=data.map(r=>mapResult(r,q)).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&p.lat>=17.873&&p.lat<=17.974&&p.lng>=-62.891&&p.lng<=-62.779)
    cache.set(key,mapped);setOnline(mapped)
   }catch{setError('Recherche en ligne indisponible. Réessayez.');setOnline([])}
   finally{setLoading(false)}
