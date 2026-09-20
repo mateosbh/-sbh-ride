@@ -3,12 +3,69 @@ import { ArrowLeft, BarChart3, Car, Check, ChevronRight, Clock3, CreditCard, Map
 import MapView from './components/MapView'; import PlacePicker from './components/PlacePicker'; import { history, initialDrivers, initialPlaces } from './data'; import type { Driver, Place, Ride, RideStatus } from './types'
 
 type Page='client'|'driver'|'admin'
+type Lang='fr'|'en'
+const EN:Record<string,string>={
+'Commander':'Book','Chauffeur':'Driver','Votre chauffeur à Saint-Barth':'Your driver in Saint Barth',
+'Où allons-nous ?':'Where are we going?','Utiliser ma position':'Use my location','Localisation…':'Locating…','Position GPS activée':'GPS location enabled','Réessayer la géolocalisation':'Retry location',
+'DÉPART':'PICKUP','DESTINATION':'DESTINATION','Durée estimée':'Estimated time','Distance':'Distance','Berline':'Sedan','Van':'Van',
+'1–4 passagers · Mercedes Classe E ou similaire':'1–4 passengers · Mercedes E-Class or similar','1–7 passagers · Mercedes Classe V ou similaire':'1–7 passengers · Mercedes V-Class or similar',
+'Choisissez votre véhicule · prix affiché et confirmé avant réservation.':'Choose your vehicle · price shown and confirmed before booking.',
+'MOYEN DE PAIEMENT':'PAYMENT METHOD','Espèces à bord':'Cash on board','Commander un chauffeur':'Book a driver',
+'Chauffeurs locaux vérifiés · Paiement sécurisé simulé':'Verified local drivers · Secure demo payment','Moyen de paiement':'Payment method',
+'Choisissez le moyen utilisé pour cette course.':'Choose how you want to pay for this ride.','Carte de démonstration · aucun débit réel':'Demo card · no real charge',
+'Paiement Apple Pay simulé · aucun débit réel':'Demo Apple Pay · no real charge','Espèces':'Cash',"Paiement au chauffeur à l'arrivée":'Pay the driver on arrival',
+'Nous contactons les chauffeurs à proximité…':'Contacting nearby drivers…','Annuler la demande':'Cancel request','Annuler la course ?':'Cancel the ride?',
+'Continuer la recherche':'Keep searching','Merci et à bientôt !':'Thank you, see you soon!','Course terminée':'Ride completed','Nouvelle course':'New ride',
+'VOTRE CHAUFFEUR':'YOUR DRIVER','Votre chauffeur arrive':'Your driver is arriving','Votre chauffeur est arrivé':'Your driver has arrived','Course en cours':'Ride in progress',
+'Annuler la course':'Cancel ride','Chauffeur arrivé':'Driver arrived','Passager à bord':'Passenger on board','Terminer':'Finish',
+'Garder ma course':'Keep my ride','ESPACE PARTENAIRE':'DRIVER PARTNER','Prenez la route.':'Get on the road.','À votre rythme.':'On your terms.',
+'Bienvenue chauffeur':'Welcome, driver','Connectez-vous à votre espace sécurisé.':'Sign in to your secure area.','Téléphone':'Phone','Code chauffeur':'Driver code',
+'Se connecter':'Sign in','Nouveau chauffeur':'New driver','Demander à devenir chauffeur':'Apply to become a driver','Devenir chauffeur SBH Ride':'Become an SBH Ride driver',
+'Nom complet':'Full name','Véhicule':'Vehicle','Plaque':'Plate','Justificatifs':'Documents','Envoyer la demande (démo)':'Send application (demo)',
+'Vous êtes disponible':'You are available','Vous êtes hors ligne':'You are offline','Disponible':'Available','Indisponible':'Unavailable',
+'Voir la grille tarifaire':'View fare grid','Grille tarifaire SBH Ride':'SBH Ride fare grid','Proposer une modification':'Suggest a change','Compris':'Got it',
+'NOUVELLE DEMANDE':'NEW REQUEST','PRISE EN CHARGE':'PICKUP','Refuser':'Decline','Accepter':'Accept','PROCHAINE ÉTAPE':'NEXT STEP',
+'Je suis arrivé':'I have arrived','Terminer la course':'Finish ride','Retour aux courses':'Back to rides','Recherche de courses…':'Searching for rides…','Passez disponible':'Go online',
+'ADMIN':'ADMIN','Centre de contrôle':'Control center','Vue d’ensemble':'Overview','Chauffeurs':'Drivers','Courses':'Rides','Système opérationnel':'System operational',
+'TARIFICATION CENTRALE':'CENTRAL PRICING','Grille tarifaire concertée':'Agreed fare grid','Modifier la grille':'Edit fare grid','Tarification centrale':'Central pricing',
+'Appliquer partout':'Apply everywhere','PROPOSITION CHAUFFEUR':'DRIVER PROPOSAL','Nouveau tarif proposé':'New proposed fare','Accepter et appliquer':'Accept and apply',
+'Courses aujourd’hui':'Rides today','Chauffeurs actifs':'Active drivers','Temps moyen':'Average time',"Chiffre d’affaires":'Revenue','Courses en cours':'Active rides',
+'Activité des zones':'Area activity','Demandes chauffeur':'Driver applications','À valider':'Pending review','Valider':'Approve','Chauffeurs partenaires':'Partner drivers',
+'Suspendre':'Suspend','Réactiver':'Reactivate','Historique des courses':'Ride history','Ajouter un lieu':'Add place','Supprimer':'Delete','Ajouter un lieu':'Add place',
+'Nom':'Name','Adresse / description':'Address / description','Catégorie':'Category','Enregistrer le lieu':'Save place'
+}
+const translateText=(value:string,lang:Lang)=>{
+ if(lang==='fr') return value
+ const raw=value, t=raw.trim()
+ if(EN[t]) return raw.replace(t,EN[t])
+ return raw
+}
+function LanguageLayer({lang}:{lang:Lang}){
+ useEffect(()=>{
+  document.documentElement.lang=lang
+  const apply=()=>{
+   document.querySelectorAll('body *').forEach(el=>{
+    if(el instanceof HTMLElement && !el.closest('.lang-switch')){
+      el.childNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE&&n.textContent){const v=translateText(n.textContent,lang);if(v!==n.textContent)n.textContent=v}})
+      if(el instanceof HTMLInputElement && el.placeholder){
+       const p=translateText(el.placeholder,lang); if(p!==el.placeholder) el.placeholder=p
+      }
+    }
+   })
+  }
+  apply()
+  const o=new MutationObserver(apply);o.observe(document.body,{subtree:true,childList:true})
+  return()=>o.disconnect()
+ },[lang])
+ return null
+}
+
 type Pricing={carPrice:number;vanPrice:number}
 const defaultPricing:Pricing={carPrice:35,vanPrice:47}
 const fareFor=(pricing:Pricing,type:'car'|'van',_km:number)=>type==='car'?pricing.carPrice:pricing.vanPrice
 const numberValue=(v:string)=>v
 const statusCopy:Record<RideStatus,string>={idle:'Prêt à commander',searching:'Recherche de votre chauffeur',accepted:'Chauffeur confirmé',arriving:'Votre chauffeur arrive',arrived:'Votre chauffeur est arrivé',onboard:'Course en cours',completed:'Vous êtes arrivé'}
-function Header({page,setPage}:{page:Page;setPage:(p:Page)=>void}) { const [open,setOpen]=useState(false); return <header><button className="brand" onClick={()=>setPage('client')}><span className="brand-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 22c-3-8-10-10-17-8 5 1 9 4 11 9M25 21c4-8 11-9 17-6-5 0-10 3-12 9M23 18c-1-7-6-11-12-12 5 4 7 8 7 13M26 18c2-7 7-10 13-10-5 3-8 7-9 12"/></svg></span><span className="brand-copy"><b>SBH RIDE</b><small>SAINT-BARTHÉLEMY</small></span></button><nav>{([['client','Commander'],['driver','Chauffeur'],['admin','Admin']] as [Page,string][]).map(([p,l])=><button className={page===p?'active':''} onClick={()=>setPage(p)} key={p}>{l}</button>)}</nav><button className="menu" onClick={()=>setOpen(!open)}><Menu/></button>{open&&<div className="mobile-nav">{(['client','driver','admin'] as Page[]).map(p=><button onClick={()=>{setPage(p);setOpen(false)}}>{p==='client'?'Commander':p==='driver'?'Chauffeur':'Admin'}<ChevronRight/></button>)}</div>}</header> }
+function Header({page,setPage,lang,setLang}:{page:Page;setPage:(p:Page)=>void;lang:Lang;setLang:(l:Lang)=>void}) { const [open,setOpen]=useState(false); return <header><button className="brand" onClick={()=>setPage('client')}><span className="brand-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 22c-3-8-10-10-17-8 5 1 9 4 11 9M25 21c4-8 11-9 17-6-5 0-10 3-12 9M23 18c-1-7-6-11-12-12 5 4 7 8 7 13M26 18c2-7 7-10 13-10-5 3-8 7-9 12"/></svg></span><span className="brand-copy"><b>SBH RIDE</b><small>SAINT-BARTHÉLEMY</small></span></button><nav>{([['client','Commander'],['driver','Chauffeur'],['admin','Admin']] as [Page,string][]).map(([p,l])=><button className={page===p?'active':''} onClick={()=>setPage(p)} key={p}>{l}</button>)}</nav><div className="lang-switch" aria-label="Language"><button className={lang==='fr'?'active':''} onClick={()=>setLang('fr')}>FR</button><span>/</span><button className={lang==='en'?'active':''} onClick={()=>setLang('en')}>EN</button></div><button className="menu" onClick={()=>setOpen(!open)}><Menu/></button>{open&&<div className="mobile-nav">{(['client','driver','admin'] as Page[]).map(p=><button onClick={()=>{setPage(p);setOpen(false)}}>{p==='client'?'Commander':p==='driver'?'Chauffeur':'Admin'}<ChevronRight/></button>)}</div>}</header> }
 
 function Client({places,pricing}:{places:Place[];pricing:Pricing}) {
  const [pickup,setPickup]=useState<Place>(places[0]),[destination,setDestination]=useState<Place>(places[1]),[status,setStatus]=useState<RideStatus>('idle'),[rideType,setRideType]=useState<'car'|'van'>('car'),[progress,setProgress]=useState(0),[payment,setPayment]=useState<'card'|'cash'|'applepay'>('card'),[payOpen,setPayOpen]=useState(false),[cancelOpen,setCancelOpen]=useState(false),[userLocation,setUserLocation]=useState<{lat:number;lng:number}|undefined>(),[geoState,setGeoState]=useState<'idle'|'loading'|'on'|'error'>('idle'),[routeInfo,setRouteInfo]=useState<{km:number;min:number}|null>(null)
@@ -43,4 +100,4 @@ function Admin({places,setPlaces,pricing,setPricing,pendingPricing,setPendingPri
 }
 function RideRows({rides,drivers}:{rides:Ride[];drivers:Driver[]}){return <div className="ride-rows">{rides.map(r=><div><span className="ride-icon"><Car/></span><p><b>{r.id}</b><small>{r.pickup.name} → {r.destination.name}</small></p><span>{drivers.find(d=>d.id===r.driverId)?.name||'Thomas'}</span><span className={`status ${r.status}`}>{r.status==='completed'?'Terminée':r.status==='onboard'?'En course':'En route'}</span><b>{r.price} €</b></div>)}</div>}
 function AppUpdater(){useEffect(()=>{const BUILD='2026-09-20-applepay-v2';const current=localStorage.getItem('sbh-build-version');if(current!==BUILD){localStorage.setItem('sbh-build-version',BUILD);const url=new URL(window.location.href);if(url.searchParams.get('v')!==BUILD){url.searchParams.set('v',BUILD);window.location.replace(url.toString())}}},[]);return null}
-export default function App(){const [page,setPage]=useState<Page>('client');const [pricing,setPricingState]=useState<Pricing>(()=>{try{const old=JSON.parse(localStorage.getItem('sbh-pricing')||'{}');return {carPrice:Number(old.carPrice??35),vanPrice:Number(old.vanPrice??47)}}catch{return defaultPricing}});const [pendingPricing,setPendingPricing]=useState<Pricing|null>(null);const setPricing=(p:Pricing)=>{setPricingState(p);localStorage.setItem('sbh-pricing',JSON.stringify(p))};const [places,setPlaces]=useState<Place[]>(()=>{try{const saved=JSON.parse(localStorage.getItem('sbh-places')||'[]') as Place[];const merged=new globalThis.Map<string,Place>();initialPlaces.forEach(p=>merged.set(p.id,p));saved.forEach(p=>merged.set(p.id,p));return [...merged.values()]}catch{return initialPlaces}});useEffect(()=>localStorage.setItem('sbh-places',JSON.stringify(places)),[places]); return <><AppUpdater/><Header page={page} setPage={setPage}/>{page==='client'?<Client places={places} pricing={pricing}/>:page==='driver'?<DriverSpace places={places} pricing={pricing} onPropose={setPendingPricing}/>:<Admin places={places} setPlaces={setPlaces} pricing={pricing} setPricing={setPricing} pendingPricing={pendingPricing} setPendingPricing={setPendingPricing}/>}</>}
+export default function App(){const [page,setPage]=useState<Page>('client');const [lang,setLangState]=useState<Lang>(()=>(localStorage.getItem('sbh-lang') as Lang)||'fr');const setLang=(l:Lang)=>{setLangState(l);localStorage.setItem('sbh-lang',l);location.reload()};const [pricing,setPricingState]=useState<Pricing>(()=>{try{const old=JSON.parse(localStorage.getItem('sbh-pricing')||'{}');return {carPrice:Number(old.carPrice??35),vanPrice:Number(old.vanPrice??47)}}catch{return defaultPricing}});const [pendingPricing,setPendingPricing]=useState<Pricing|null>(null);const setPricing=(p:Pricing)=>{setPricingState(p);localStorage.setItem('sbh-pricing',JSON.stringify(p))};const [places,setPlaces]=useState<Place[]>(()=>{try{const saved=JSON.parse(localStorage.getItem('sbh-places')||'[]') as Place[];const merged=new globalThis.Map<string,Place>();initialPlaces.forEach(p=>merged.set(p.id,p));saved.forEach(p=>merged.set(p.id,p));return [...merged.values()]}catch{return initialPlaces}});useEffect(()=>localStorage.setItem('sbh-places',JSON.stringify(places)),[places]); return <><AppUpdater/><LanguageLayer lang={lang}/><Header page={page} setPage={setPage} lang={lang} setLang={setLang}/>{page==='client'?<Client places={places} pricing={pricing}/>:page==='driver'?<DriverSpace places={places} pricing={pricing} onPropose={setPendingPricing}/>:<Admin places={places} setPlaces={setPlaces} pricing={pricing} setPricing={setPricing} pendingPricing={pendingPricing} setPendingPricing={setPendingPricing}/>}</>}
