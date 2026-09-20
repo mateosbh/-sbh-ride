@@ -140,3 +140,40 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
  .driver-pricing-actions .outline,.driver-pricing-actions .primary{width:100%}
  .proposal-fields{grid-template-columns:1fr}
 }
+
+
+/* Driver place proposals */
+.driver-place-card{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#fff;border:1px solid #e2e7e9;border-radius:16px;padding:17px 18px;margin:0 0 18px;box-shadow:0 8px 24px rgba(16,24,32,.045)}
+.driver-place-card small{display:block;font-size:8px;letter-spacing:1.4px;color:#a17b43;font-weight:800;margin-bottom:4px}
+.driver-place-card h3{margin:0 0 5px;font-size:17px;color:#102a43}
+.driver-place-card p{margin:0;color:#788891;font-size:11px;line-height:1.45;max-width:720px}
+.driver-place-card .outline{display:flex;align-items:center;gap:7px;white-space:nowrap;padding:10px 13px}
+.driver-place-card .outline svg{width:17px}
+.place-proposal-modal{width:min(620px,100%)}
+.proposal-map{height:270px;border-radius:14px;overflow:hidden;margin:15px 0;border:1px solid #dfe5e7}
+.proposal-map .map{height:100%!important}
+.proposal-coords{display:flex;align-items:center;gap:10px;background:#f5f7f8;border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.proposal-coords>svg{width:18px;color:#b18543}
+.proposal-coords span{display:flex;flex-direction:column}
+.proposal-coords b{font-size:11px;color:#25343d}
+.proposal-coords small{font-size:10px;color:#7d8b93}
+.pending-places{margin-bottom:18px}
+.pending-place-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 0;border-top:1px solid #edf0f1}
+.pending-place-row:first-of-type{border-top:0}
+.pending-place-row>div:first-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pending-place-row small{font-size:8px;letter-spacing:1px;color:#a27d45;font-weight:800}
+.pending-place-row b{font-size:14px;color:#102a43}
+.pending-place-row span{font-size:11px;color:#788891}
+.pending-place-row em{font-size:9px;color:#9aa5ab;font-style:normal}
+.pending-place-actions{display:flex;gap:8px;flex:0 0 auto}
+.pending-place-actions .primary,.pending-place-actions .outline{min-height:38px;padding:8px 11px}
+.pending-place-actions .primary{display:flex;align-items:center;gap:6px}
+.pending-place-actions svg{width:15px}
+@media(max-width:800px){
+ .driver-place-card{align-items:flex-start;flex-direction:column}
+ .driver-place-card .outline{width:100%;justify-content:center}
+ .proposal-map{height:230px}
+ .pending-place-row{align-items:flex-start;flex-direction:column}
+ .pending-place-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .pending-place-actions button{width:100%}
+}
