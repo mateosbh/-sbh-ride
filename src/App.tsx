@@ -3,8 +3,9 @@ import { ArrowLeft, BarChart3, Car, Check, ChevronRight, Clock3, CreditCard, Map
 import MapView from './components/MapView'; import PlacePicker from './components/PlacePicker'; import { history, initialDrivers, initialPlaces } from './data'; import type { Driver, Place, Ride, RideStatus } from './types'
 
 type Page='client'|'driver'|'admin'
-type Lang='fr'|'en'
-const EN:Record<string,string>={
+type Lang='fr'|'en'|'es'|'it'|'de'|'pt'
+const TRANSLATIONS:Record<Exclude<Lang,'fr'>,Record<string,string>>={
+en:{
 'Commander':'Book','Chauffeur':'Driver','Votre chauffeur à Saint-Barth':'Your driver in Saint Barth',
 'Où allons-nous ?':'Where are we going?','Utiliser ma position':'Use my location','Localisation…':'Locating…','Position GPS activée':'GPS location enabled','Réessayer la géolocalisation':'Retry location',
 'DÉPART':'PICKUP','DESTINATION':'DESTINATION','Durée estimée':'Estimated time','Distance':'Distance','Berline':'Sedan','Van':'Van',
@@ -14,31 +15,116 @@ const EN:Record<string,string>={
 'Chauffeurs locaux vérifiés · Paiement sécurisé simulé':'Verified local drivers · Secure demo payment','Moyen de paiement':'Payment method',
 'Choisissez le moyen utilisé pour cette course.':'Choose how you want to pay for this ride.','Carte de démonstration · aucun débit réel':'Demo card · no real charge',
 'Paiement Apple Pay simulé · aucun débit réel':'Demo Apple Pay · no real charge','Espèces':'Cash',"Paiement au chauffeur à l'arrivée":'Pay the driver on arrival',
-'Nous contactons les chauffeurs à proximité…':'Contacting nearby drivers…','Annuler la demande':'Cancel request','Annuler la course ?':'Cancel the ride?',
-'Continuer la recherche':'Keep searching','Merci et à bientôt !':'Thank you, see you soon!','Course terminée':'Ride completed','Nouvelle course':'New ride',
-'VOTRE CHAUFFEUR':'YOUR DRIVER','Votre chauffeur arrive':'Your driver is arriving','Votre chauffeur est arrivé':'Your driver has arrived','Course en cours':'Ride in progress',
-'Annuler la course':'Cancel ride','Chauffeur arrivé':'Driver arrived','Passager à bord':'Passenger on board','Terminer':'Finish',
-'Garder ma course':'Keep my ride','ESPACE PARTENAIRE':'DRIVER PARTNER','Prenez la route.':'Get on the road.','À votre rythme.':'On your terms.',
-'Bienvenue chauffeur':'Welcome, driver','Connectez-vous à votre espace sécurisé.':'Sign in to your secure area.','Téléphone':'Phone','Code chauffeur':'Driver code',
-'Se connecter':'Sign in','Nouveau chauffeur':'New driver','Demander à devenir chauffeur':'Apply to become a driver','Devenir chauffeur SBH Ride':'Become an SBH Ride driver',
-'Nom complet':'Full name','Véhicule':'Vehicle','Plaque':'Plate','Justificatifs':'Documents','Envoyer la demande (démo)':'Send application (demo)',
-'Vous êtes disponible':'You are available','Vous êtes hors ligne':'You are offline','Disponible':'Available','Indisponible':'Unavailable',
-'Voir la grille tarifaire':'View fare grid','Grille tarifaire SBH Ride':'SBH Ride fare grid','Proposer une modification':'Suggest a change','Compris':'Got it',
-'NOUVELLE DEMANDE':'NEW REQUEST','PRISE EN CHARGE':'PICKUP','Refuser':'Decline','Accepter':'Accept','PROCHAINE ÉTAPE':'NEXT STEP',
-'Je suis arrivé':'I have arrived','Terminer la course':'Finish ride','Retour aux courses':'Back to rides','Recherche de courses…':'Searching for rides…','Passez disponible':'Go online',
-'ADMIN':'ADMIN','Centre de contrôle':'Control center','Vue d’ensemble':'Overview','Chauffeurs':'Drivers','Courses':'Rides','Système opérationnel':'System operational',
-'TARIFICATION CENTRALE':'CENTRAL PRICING','Grille tarifaire concertée':'Agreed fare grid','Modifier la grille':'Edit fare grid','Tarification centrale':'Central pricing',
-'Appliquer partout':'Apply everywhere','PROPOSITION CHAUFFEUR':'DRIVER PROPOSAL','Nouveau tarif proposé':'New proposed fare','Accepter et appliquer':'Accept and apply',
-'Courses aujourd’hui':'Rides today','Chauffeurs actifs':'Active drivers','Temps moyen':'Average time',"Chiffre d’affaires":'Revenue','Courses en cours':'Active rides',
-'Activité des zones':'Area activity','Demandes chauffeur':'Driver applications','À valider':'Pending review','Valider':'Approve','Chauffeurs partenaires':'Partner drivers',
-'Suspendre':'Suspend','Réactiver':'Reactivate','Historique des courses':'Ride history','Ajouter un lieu':'Add place','Supprimer':'Delete','Ajouter un lieu':'Add place',
-'Nom':'Name','Adresse / description':'Address / description','Catégorie':'Category','Enregistrer le lieu':'Save place'
+'Nous contactons les chauffeurs à proximité…':'Contacting nearby drivers…','Vous êtes prioritaire dans la zone de':'You have priority in the area of','Annuler la demande':'Cancel request',
+'Annuler la course ?':'Cancel the ride?','La recherche du chauffeur sera arrêtée. Aucun frais dans cette démo.':'The driver search will stop. No fee in this demo.',
+'Changement de programme':'Change of plans','Erreur de destination':'Wrong destination','Temps d’attente trop long':'Waiting time too long','Autre raison':'Other reason','Continuer la recherche':'Keep searching',
+'Merci et à bientôt !':'Thank you, see you soon!','Course terminée':'Ride completed','Nouvelle course':'New ride','VOTRE CHAUFFEUR':'YOUR DRIVER',
+'Votre chauffeur arrive':'Your driver is arriving','Votre chauffeur est arrivé':'Your driver has arrived','Course en cours':'Ride in progress','Arrivée prévue dans 4 min':'Arrival in 4 min',
+'Votre chauffeur vous attend':'Your driver is waiting for you','Direction':'Heading to','Bonne route !':'Enjoy the ride!','Annuler la course':'Cancel ride','Chauffeur trop loin':'Driver too far',
+'Confirmez l’annulation de votre demande.':'Confirm cancellation of your request.','Garder ma course':'Keep my ride','Chauffeur arrivé':'Driver arrived','Passager à bord':'Passenger on board','Terminer':'Finish',
+'Paiement :':'Payment:','paiement simulé':'demo payment','à régler au chauffeur':'pay the driver',
+'Choisir un lieu':'Choose a place','Rechercher partout à Saint-Barth':'Search across Saint Barth','Modifier':'Edit','Villa, adresse, rue, resto, hôtel…':'Villa, address, street, restaurant, hotel…',
+'Lieux et établissements SBH':'SBH places and venues','Recherche des adresses et lieux de Saint-Barth…':'Searching Saint Barth addresses and places…',
+'Rechercher':'Search','partout à Saint-Barth':'across Saint Barth','Adresses · rues · quartiers · villas · hôtels · restaurants · commerces':'Addresses · streets · neighborhoods · villas · hotels · restaurants · shops',
+'Aucun lieu public correspondant trouvé. Ajoute-le dans SBH Places s’il s’agit d’une villa privée.':'No matching public place found. Add it in SBH Places if it is a private villa.',
+'Recherche étendue Saint-Barth · OpenStreetMap / Overpass':'Extended Saint Barth search · OpenStreetMap / Overpass',
+'Recherche en ligne indisponible. Réessayez.':'Online search unavailable. Please try again.'
+},
+es:{
+'Commander':'Reservar','Chauffeur':'Conductor','Votre chauffeur à Saint-Barth':'Tu conductor en Saint Barth','Où allons-nous ?':'¿Adónde vamos?','Utiliser ma position':'Usar mi ubicación',
+'Localisation…':'Localizando…','Position GPS activée':'Ubicación GPS activada','Réessayer la géolocalisation':'Reintentar ubicación','DÉPART':'RECOGIDA','DESTINATION':'DESTINO',
+'Durée estimée':'Tiempo estimado','Distance':'Distancia','Berline':'Sedán','Van':'Van','1–4 passagers · Mercedes Classe E ou similaire':'1–4 pasajeros · Mercedes Clase E o similar',
+'1–7 passagers · Mercedes Classe V ou similaire':'1–7 pasajeros · Mercedes Clase V o similar','Choisissez votre véhicule · prix affiché et confirmé avant réservation.':'Elige tu vehículo · precio mostrado y confirmado antes de reservar.',
+'MOYEN DE PAIEMENT':'MÉTODO DE PAGO','Espèces à bord':'Efectivo a bordo','Commander un chauffeur':'Reservar un conductor','Chauffeurs locaux vérifiés · Paiement sécurisé simulé':'Conductores locales verificados · Pago seguro de demostración',
+'Moyen de paiement':'Método de pago','Choisissez le moyen utilisé pour cette course.':'Elige cómo quieres pagar este trayecto.','Carte de démonstration · aucun débit réel':'Tarjeta de demostración · sin cargo real',
+'Paiement Apple Pay simulé · aucun débit réel':'Apple Pay de demostración · sin cargo real','Espèces':'Efectivo',"Paiement au chauffeur à l'arrivée":'Pago al conductor al llegar',
+'Nous contactons les chauffeurs à proximité…':'Contactando a conductores cercanos…','Vous êtes prioritaire dans la zone de':'Tienes prioridad en la zona de','Annuler la demande':'Cancelar solicitud',
+'Annuler la course ?':'¿Cancelar el trayecto?','La recherche du chauffeur sera arrêtée. Aucun frais dans cette démo.':'Se detendrá la búsqueda de conductor. Sin cargos en esta demo.',
+'Changement de programme':'Cambio de planes','Erreur de destination':'Destino incorrecto','Temps d’attente trop long':'Espera demasiado larga','Autre raison':'Otro motivo','Continuer la recherche':'Continuar buscando',
+'Merci et à bientôt !':'¡Gracias y hasta pronto!','Course terminée':'Trayecto terminado','Nouvelle course':'Nuevo trayecto','VOTRE CHAUFFEUR':'TU CONDUCTOR','Votre chauffeur arrive':'Tu conductor está llegando',
+'Votre chauffeur est arrivé':'Tu conductor ha llegado','Course en cours':'Trayecto en curso','Arrivée prévue dans 4 min':'Llegada prevista en 4 min','Votre chauffeur vous attend':'Tu conductor te está esperando',
+'Direction':'Hacia','Bonne route !':'¡Buen viaje!','Annuler la course':'Cancelar trayecto','Chauffeur trop loin':'Conductor demasiado lejos','Confirmez l’annulation de votre demande.':'Confirma la cancelación de tu solicitud.',
+'Garder ma course':'Mantener mi trayecto','Chauffeur arrivé':'Conductor llegado','Passager à bord':'Pasajero a bordo','Terminer':'Finalizar','Paiement :':'Pago:','paiement simulé':'pago de demostración','à régler au chauffeur':'pagar al conductor',
+'Choisir un lieu':'Elegir un lugar','Rechercher partout à Saint-Barth':'Buscar en todo Saint Barth','Modifier':'Editar','Villa, adresse, rue, resto, hôtel…':'Villa, dirección, calle, restaurante, hotel…',
+'Lieux et établissements SBH':'Lugares y establecimientos de SBH','Recherche des adresses et lieux de Saint-Barth…':'Buscando direcciones y lugares en Saint Barth…','Rechercher':'Buscar','partout à Saint-Barth':'en todo Saint Barth',
+'Adresses · rues · quartiers · villas · hôtels · restaurants · commerces':'Direcciones · calles · barrios · villas · hoteles · restaurantes · tiendas',
+'Aucun lieu public correspondant trouvé. Ajoute-le dans SBH Places s’il s’agit d’une villa privée.':'No se encontró ningún lugar público. Añádelo en SBH Places si es una villa privada.',
+'Recherche étendue Saint-Barth · OpenStreetMap / Overpass':'Búsqueda ampliada Saint Barth · OpenStreetMap / Overpass','Recherche en ligne indisponible. Réessayez.':'Búsqueda en línea no disponible. Inténtalo de nuevo.'
+},
+it:{
+'Commander':'Prenota','Chauffeur':'Autista','Votre chauffeur à Saint-Barth':'Il tuo autista a Saint Barth','Où allons-nous ?':'Dove andiamo?','Utiliser ma position':'Usa la mia posizione','Localisation…':'Localizzazione…',
+'Position GPS activée':'Posizione GPS attivata','Réessayer la géolocalisation':'Riprova localizzazione','DÉPART':'PARTENZA','DESTINATION':'DESTINAZIONE','Durée estimée':'Tempo stimato','Distance':'Distanza',
+'Berline':'Berlina','Van':'Van','1–4 passagers · Mercedes Classe E ou similaire':'1–4 passeggeri · Mercedes Classe E o simile','1–7 passagers · Mercedes Classe V ou similaire':'1–7 passeggeri · Mercedes Classe V o simile',
+'Choisissez votre véhicule · prix affiché et confirmé avant réservation.':'Scegli il veicolo · prezzo mostrato e confermato prima della prenotazione.','MOYEN DE PAIEMENT':'METODO DI PAGAMENTO',
+'Espèces à bord':'Contanti a bordo','Commander un chauffeur':'Prenota un autista','Chauffeurs locaux vérifiés · Paiement sécurisé simulé':'Autisti locali verificati · Pagamento demo sicuro',
+'Moyen de paiement':'Metodo di pagamento','Choisissez le moyen utilisé pour cette course.':'Scegli come pagare questa corsa.','Carte de démonstration · aucun débit réel':'Carta demo · nessun addebito reale',
+'Paiement Apple Pay simulé · aucun débit réel':'Apple Pay demo · nessun addebito reale','Espèces':'Contanti',"Paiement au chauffeur à l'arrivée":'Pagamento all’autista all’arrivo',
+'Nous contactons les chauffeurs à proximité…':'Stiamo contattando gli autisti vicini…','Vous êtes prioritaire dans la zone de':'Hai priorità nella zona di','Annuler la demande':'Annulla richiesta',
+'Annuler la course ?':'Annullare la corsa?','La recherche du chauffeur sera arrêtée. Aucun frais dans cette démo.':'La ricerca dell’autista verrà interrotta. Nessun costo in questa demo.',
+'Changement de programme':'Cambio di programma','Erreur de destination':'Destinazione errata','Temps d’attente trop long':'Attesa troppo lunga','Autre raison':'Altro motivo','Continuer la recherche':'Continua la ricerca',
+'Merci et à bientôt !':'Grazie e a presto!','Course terminée':'Corsa terminata','Nouvelle course':'Nuova corsa','VOTRE CHAUFFEUR':'IL TUO AUTISTA','Votre chauffeur arrive':'Il tuo autista sta arrivando',
+'Votre chauffeur est arrivé':'Il tuo autista è arrivato','Course en cours':'Corsa in corso','Arrivée prévue dans 4 min':'Arrivo previsto tra 4 min','Votre chauffeur vous attend':'Il tuo autista ti aspetta',
+'Direction':'Direzione','Bonne route !':'Buon viaggio!','Annuler la course':'Annulla corsa','Chauffeur trop loin':'Autista troppo lontano','Confirmez l’annulation de votre demande.':'Conferma l’annullamento della richiesta.',
+'Garder ma course':'Mantieni la corsa','Chauffeur arrivé':'Autista arrivato','Passager à bord':'Passeggero a bordo','Terminer':'Termina','Paiement :':'Pagamento:','paiement simulé':'pagamento demo','à régler au chauffeur':'da pagare all’autista',
+'Choisir un lieu':'Scegli un luogo','Rechercher partout à Saint-Barth':'Cerca in tutta Saint Barth','Modifier':'Modifica','Villa, adresse, rue, resto, hôtel…':'Villa, indirizzo, strada, ristorante, hotel…',
+'Lieux et établissements SBH':'Luoghi e attività SBH','Recherche des adresses et lieux de Saint-Barth…':'Ricerca di indirizzi e luoghi a Saint Barth…','Rechercher':'Cerca','partout à Saint-Barth':'in tutta Saint Barth',
+'Adresses · rues · quartiers · villas · hôtels · restaurants · commerces':'Indirizzi · strade · quartieri · ville · hotel · ristoranti · negozi',
+'Aucun lieu public correspondant trouvé. Ajoute-le dans SBH Places s’il s’agit d’une villa privée.':'Nessun luogo pubblico corrispondente trovato. Aggiungilo in SBH Places se è una villa privata.',
+'Recherche étendue Saint-Barth · OpenStreetMap / Overpass':'Ricerca estesa Saint Barth · OpenStreetMap / Overpass','Recherche en ligne indisponible. Réessayez.':'Ricerca online non disponibile. Riprova.'
+},
+de:{
+'Commander':'Buchen','Chauffeur':'Fahrer','Votre chauffeur à Saint-Barth':'Ihr Fahrer auf Saint Barth','Où allons-nous ?':'Wohin geht es?','Utiliser ma position':'Meinen Standort verwenden','Localisation…':'Standort wird ermittelt…',
+'Position GPS activée':'GPS-Standort aktiviert','Réessayer la géolocalisation':'Standort erneut versuchen','DÉPART':'ABHOLUNG','DESTINATION':'ZIEL','Durée estimée':'Geschätzte Dauer','Distance':'Entfernung',
+'Berline':'Limousine','Van':'Van','1–4 passagers · Mercedes Classe E ou similaire':'1–4 Fahrgäste · Mercedes E-Klasse oder ähnlich','1–7 passagers · Mercedes Classe V ou similaire':'1–7 Fahrgäste · Mercedes V-Klasse oder ähnlich',
+'Choisissez votre véhicule · prix affiché et confirmé avant réservation.':'Wählen Sie Ihr Fahrzeug · Preis wird vor der Buchung angezeigt und bestätigt.','MOYEN DE PAIEMENT':'ZAHLUNGSART',
+'Espèces à bord':'Barzahlung im Fahrzeug','Commander un chauffeur':'Fahrer buchen','Chauffeurs locaux vérifiés · Paiement sécurisé simulé':'Geprüfte lokale Fahrer · Sichere Demo-Zahlung',
+'Moyen de paiement':'Zahlungsart','Choisissez le moyen utilisé pour cette course.':'Wählen Sie die Zahlungsart für diese Fahrt.','Carte de démonstration · aucun débit réel':'Demo-Karte · keine echte Belastung',
+'Paiement Apple Pay simulé · aucun débit réel':'Apple Pay Demo · keine echte Belastung','Espèces':'Barzahlung',"Paiement au chauffeur à l'arrivée":'Beim Fahrer bei Ankunft bezahlen',
+'Nous contactons les chauffeurs à proximité…':'Fahrer in Ihrer Nähe werden kontaktiert…','Vous êtes prioritaire dans la zone de':'Sie haben Priorität im Bereich','Annuler la demande':'Anfrage stornieren',
+'Annuler la course ?':'Fahrt stornieren?','La recherche du chauffeur sera arrêtée. Aucun frais dans cette démo.':'Die Fahrersuche wird beendet. Keine Gebühr in dieser Demo.',
+'Changement de programme':'Planänderung','Erreur de destination':'Falsches Ziel','Temps d’attente trop long':'Wartezeit zu lang','Autre raison':'Anderer Grund','Continuer la recherche':'Suche fortsetzen',
+'Merci et à bientôt !':'Vielen Dank und bis bald!','Course terminée':'Fahrt beendet','Nouvelle course':'Neue Fahrt','VOTRE CHAUFFEUR':'IHR FAHRER','Votre chauffeur arrive':'Ihr Fahrer kommt',
+'Votre chauffeur est arrivé':'Ihr Fahrer ist angekommen','Course en cours':'Fahrt läuft','Arrivée prévue dans 4 min':'Ankunft in 4 Min.','Votre chauffeur vous attend':'Ihr Fahrer wartet auf Sie',
+'Direction':'Richtung','Bonne route !':'Gute Fahrt!','Annuler la course':'Fahrt stornieren','Chauffeur trop loin':'Fahrer zu weit entfernt','Confirmez l’annulation de votre demande.':'Bestätigen Sie die Stornierung Ihrer Anfrage.',
+'Garder ma course':'Fahrt behalten','Chauffeur arrivé':'Fahrer angekommen','Passager à bord':'Fahrgast an Bord','Terminer':'Beenden','Paiement :':'Zahlung:','paiement simulé':'Demo-Zahlung','à régler au chauffeur':'beim Fahrer zu zahlen',
+'Choisir un lieu':'Ort auswählen','Rechercher partout à Saint-Barth':'Auf ganz Saint Barth suchen','Modifier':'Ändern','Villa, adresse, rue, resto, hôtel…':'Villa, Adresse, Straße, Restaurant, Hotel…',
+'Lieux et établissements SBH':'Orte und Betriebe auf SBH','Recherche des adresses et lieux de Saint-Barth…':'Adressen und Orte auf Saint Barth werden gesucht…','Rechercher':'Suchen','partout à Saint-Barth':'auf ganz Saint Barth',
+'Adresses · rues · quartiers · villas · hôtels · restaurants · commerces':'Adressen · Straßen · Viertel · Villen · Hotels · Restaurants · Geschäfte',
+'Aucun lieu public correspondant trouvé. Ajoute-le dans SBH Places s’il s’agit d’une villa privée.':'Kein passender öffentlicher Ort gefunden. Fügen Sie ihn in SBH Places hinzu, wenn es eine private Villa ist.',
+'Recherche étendue Saint-Barth · OpenStreetMap / Overpass':'Erweiterte Saint-Barth-Suche · OpenStreetMap / Overpass','Recherche en ligne indisponible. Réessayez.':'Online-Suche nicht verfügbar. Bitte erneut versuchen.'
+},
+pt:{
+'Commander':'Reservar','Chauffeur':'Motorista','Votre chauffeur à Saint-Barth':'O seu motorista em Saint Barth','Où allons-nous ?':'Para onde vamos?','Utiliser ma position':'Usar a minha localização','Localisation…':'A localizar…',
+'Position GPS activée':'Localização GPS ativada','Réessayer la géolocalisation':'Tentar localização novamente','DÉPART':'RECOLHA','DESTINATION':'DESTINO','Durée estimée':'Tempo estimado','Distance':'Distância',
+'Berline':'Sedan','Van':'Van','1–4 passagers · Mercedes Classe E ou similaire':'1–4 passageiros · Mercedes Classe E ou semelhante','1–7 passagers · Mercedes Classe V ou similaire':'1–7 passageiros · Mercedes Classe V ou semelhante',
+'Choisissez votre véhicule · prix affiché et confirmé avant réservation.':'Escolha o veículo · preço apresentado e confirmado antes da reserva.','MOYEN DE PAIEMENT':'MÉTODO DE PAGAMENTO',
+'Espèces à bord':'Dinheiro a bordo','Commander un chauffeur':'Reservar motorista','Chauffeurs locaux vérifiés · Paiement sécurisé simulé':'Motoristas locais verificados · Pagamento demo seguro',
+'Moyen de paiement':'Método de pagamento','Choisissez le moyen utilisé pour cette course.':'Escolha como pretende pagar esta viagem.','Carte de démonstration · aucun débit réel':'Cartão de demonstração · sem cobrança real',
+'Paiement Apple Pay simulé · aucun débit réel':'Apple Pay de demonstração · sem cobrança real','Espèces':'Dinheiro',"Paiement au chauffeur à l'arrivée":'Pagamento ao motorista à chegada',
+'Nous contactons les chauffeurs à proximité…':'A contactar motoristas próximos…','Vous êtes prioritaire dans la zone de':'Tem prioridade na zona de','Annuler la demande':'Cancelar pedido',
+'Annuler la course ?':'Cancelar a viagem?','La recherche du chauffeur sera arrêtée. Aucun frais dans cette démo.':'A procura de motorista será interrompida. Sem taxa nesta demo.',
+'Changement de programme':'Mudança de planos','Erreur de destination':'Destino errado','Temps d’attente trop long':'Espera demasiado longa','Autre raison':'Outro motivo','Continuer la recherche':'Continuar procura',
+'Merci et à bientôt !':'Obrigado e até breve!','Course terminée':'Viagem concluída','Nouvelle course':'Nova viagem','VOTRE CHAUFFEUR':'O SEU MOTORISTA','Votre chauffeur arrive':'O seu motorista está a chegar',
+'Votre chauffeur est arrivé':'O seu motorista chegou','Course en cours':'Viagem em curso','Arrivée prévue dans 4 min':'Chegada prevista em 4 min','Votre chauffeur vous attend':'O seu motorista está à sua espera',
+'Direction':'Destino','Bonne route !':'Boa viagem!','Annuler la course':'Cancelar viagem','Chauffeur trop loin':'Motorista demasiado longe','Confirmez l’annulation de votre demande.':'Confirme o cancelamento do seu pedido.',
+'Garder ma course':'Manter a viagem','Chauffeur arrivé':'Motorista chegou','Passager à bord':'Passageiro a bordo','Terminer':'Terminar','Paiement :':'Pagamento:','paiement simulé':'pagamento demo','à régler au chauffeur':'a pagar ao motorista',
+'Choisir un lieu':'Escolher local','Rechercher partout à Saint-Barth':'Pesquisar em toda Saint Barth','Modifier':'Editar','Villa, adresse, rue, resto, hôtel…':'Villa, endereço, rua, restaurante, hotel…',
+'Lieux et établissements SBH':'Locais e estabelecimentos SBH','Recherche des adresses et lieux de Saint-Barth…':'A pesquisar endereços e locais em Saint Barth…','Rechercher':'Pesquisar','partout à Saint-Barth':'em toda Saint Barth',
+'Adresses · rues · quartiers · villas · hôtels · restaurants · commerces':'Endereços · ruas · bairros · villas · hotéis · restaurantes · lojas',
+'Aucun lieu public correspondant trouvé. Ajoute-le dans SBH Places s’il s’agit d’une villa privée.':'Nenhum local público correspondente encontrado. Adicione-o em SBH Places se for uma villa privada.',
+'Recherche étendue Saint-Barth · OpenStreetMap / Overpass':'Pesquisa alargada Saint Barth · OpenStreetMap / Overpass','Recherche en ligne indisponible. Réessayez.':'Pesquisa online indisponível. Tente novamente.'
+}
 }
 const translateText=(value:string,lang:Lang)=>{
  if(lang==='fr') return value
- const raw=value, t=raw.trim()
- if(EN[t]) return raw.replace(t,EN[t])
- return raw
+ const dict=TRANSLATIONS[lang]
+ let out=value
+ const exact=dict[value.trim()]
+ if(exact) return value.replace(value.trim(),exact)
+ for(const [fr,tr] of Object.entries(dict)){
+  if(out.includes(fr)) out=out.split(fr).join(tr)
+ }
+ return out
 }
 function LanguageLayer({lang}:{lang:Lang}){
  useEffect(()=>{
@@ -65,7 +151,7 @@ const defaultPricing:Pricing={carPrice:35,vanPrice:47}
 const fareFor=(pricing:Pricing,type:'car'|'van',_km:number)=>type==='car'?pricing.carPrice:pricing.vanPrice
 const numberValue=(v:string)=>v
 const statusCopy:Record<RideStatus,string>={idle:'Prêt à commander',searching:'Recherche de votre chauffeur',accepted:'Chauffeur confirmé',arriving:'Votre chauffeur arrive',arrived:'Votre chauffeur est arrivé',onboard:'Course en cours',completed:'Vous êtes arrivé'}
-function Header({page,setPage,lang,setLang}:{page:Page;setPage:(p:Page)=>void;lang:Lang;setLang:(l:Lang)=>void}) { const [open,setOpen]=useState(false); return <header><button className="brand" onClick={()=>setPage('client')}><span className="brand-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 22c-3-8-10-10-17-8 5 1 9 4 11 9M25 21c4-8 11-9 17-6-5 0-10 3-12 9M23 18c-1-7-6-11-12-12 5 4 7 8 7 13M26 18c2-7 7-10 13-10-5 3-8 7-9 12"/></svg></span><span className="brand-copy"><b>SBH RIDE</b><small>SAINT-BARTHÉLEMY</small></span></button><nav>{([['client','Commander'],['driver','Chauffeur'],['admin','Admin']] as [Page,string][]).map(([p,l])=><button className={page===p?'active':''} onClick={()=>setPage(p)} key={p}>{l}</button>)}</nav><div className="lang-switch" aria-label="Language"><button className={lang==='fr'?'active':''} onClick={()=>setLang('fr')}>FR</button><span>/</span><button className={lang==='en'?'active':''} onClick={()=>setLang('en')}>EN</button></div><button className="menu" onClick={()=>setOpen(!open)}><Menu/></button>{open&&<div className="mobile-nav">{(['client','driver','admin'] as Page[]).map(p=><button onClick={()=>{setPage(p);setOpen(false)}}>{p==='client'?'Commander':p==='driver'?'Chauffeur':'Admin'}<ChevronRight/></button>)}</div>}</header> }
+function Header({page,setPage,lang,setLang}:{page:Page;setPage:(p:Page)=>void;lang:Lang;setLang:(l:Lang)=>void}) { const [open,setOpen]=useState(false); return <header><button className="brand" onClick={()=>setPage('client')}><span className="brand-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 22c-3-8-10-10-17-8 5 1 9 4 11 9M25 21c4-8 11-9 17-6-5 0-10 3-12 9M23 18c-1-7-6-11-12-12 5 4 7 8 7 13M26 18c2-7 7-10 13-10-5 3-8 7-9 12"/></svg></span><span className="brand-copy"><b>SBH RIDE</b><small>SAINT-BARTHÉLEMY</small></span></button><nav>{([['client','Commander'],['driver','Chauffeur'],['admin','Admin']] as [Page,string][]).map(([p,l])=><button className={page===p?'active':''} onClick={()=>setPage(p)} key={p}>{l}</button>)}</nav><div className="lang-switch" aria-label="Language"><select value={lang} onChange={e=>setLang(e.target.value as Lang)}><option value="fr">FR · Français</option><option value="en">EN · English</option><option value="es">ES · Español</option><option value="it">IT · Italiano</option><option value="de">DE · Deutsch</option><option value="pt">PT · Português</option></select></div><button className="menu" onClick={()=>setOpen(!open)}><Menu/></button>{open&&<div className="mobile-nav">{(['client','driver','admin'] as Page[]).map(p=><button onClick={()=>{setPage(p);setOpen(false)}}>{p==='client'?'Commander':p==='driver'?'Chauffeur':'Admin'}<ChevronRight/></button>)}</div>}</header> }
 
 function Client({places,pricing}:{places:Place[];pricing:Pricing}) {
  const [pickup,setPickup]=useState<Place>(places[0]),[destination,setDestination]=useState<Place>(places[1]),[status,setStatus]=useState<RideStatus>('idle'),[rideType,setRideType]=useState<'car'|'van'>('car'),[progress,setProgress]=useState(0),[payment,setPayment]=useState<'card'|'cash'|'applepay'>('card'),[payOpen,setPayOpen]=useState(false),[cancelOpen,setCancelOpen]=useState(false),[userLocation,setUserLocation]=useState<{lat:number;lng:number}|undefined>(),[geoState,setGeoState]=useState<'idle'|'loading'|'on'|'error'>('idle'),[routeInfo,setRouteInfo]=useState<{km:number;min:number}|null>(null)
