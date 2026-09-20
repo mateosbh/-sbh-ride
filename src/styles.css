@@ -95,3 +95,48 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
 
 .lang-switch select{border:0;outline:0;background:transparent;color:var(--ink);font-size:12px;font-weight:800;padding:4px 24px 4px 8px;min-width:118px;cursor:pointer}
 @media(max-width:760px){.lang-switch select{min-width:82px;max-width:110px;font-size:11px;padding-right:18px}}
+
+
+/* Driver pricing — clean shared fare grid */
+.driver-pricing-card{margin:0 0 22px;background:#fff;border:1px solid #e2e7e9;border-radius:18px;padding:20px;box-shadow:0 10px 28px rgba(16,24,32,.06)}
+.driver-pricing-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.driver-pricing-head>div{max-width:720px}
+.driver-pricing-head small{display:block;font-size:9px;letter-spacing:1.5px;color:#a07b43;font-weight:800;margin-bottom:5px}
+.driver-pricing-head h2{font:700 24px 'Playfair Display';margin:0;color:#101820}
+.driver-pricing-head p{margin:7px 0 0;color:#75858e;font-size:12px;line-height:1.5}
+.driver-pricing-head>svg{width:22px;height:22px;color:#b48a4b;margin-top:4px}
+.driver-fare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.driver-fare-item{display:flex;align-items:center;gap:14px;border:1px solid #e7e4de;border-radius:15px;padding:15px 16px;background:#fbfaf7}
+.fare-icon{width:45px;height:45px;border-radius:13px;background:#f3e9d7;color:#9b7139;display:grid;place-items:center;flex:0 0 auto}
+.fare-icon svg{width:23px;height:23px}
+.driver-fare-item>div{min-width:0}
+.driver-fare-item small{display:block;font-size:9px;letter-spacing:.7px;color:#7b858b;font-weight:800}
+.driver-fare-item b{display:block;font-size:26px;color:#101820;line-height:1.15;margin-top:4px}
+.driver-fare-item span{font-size:10px;color:#9aa1a5}
+.driver-pricing-actions{display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.driver-pricing-actions .outline,.driver-pricing-actions .primary{min-height:42px;padding:10px 15px;border-radius:10px;font-weight:800}
+.pricing-info-modal .pricing-rule{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-top:1px solid #edf0f1}
+.pricing-info-modal .pricing-rule>svg{width:19px;color:#198360;margin-top:2px}
+.pricing-info-modal .pricing-rule span{display:flex;flex-direction:column;gap:2px}
+.pricing-info-modal .pricing-rule b{font-size:13px;color:#102a43}
+.pricing-info-modal .pricing-rule small{font-size:11px;color:#7d8b93}
+.pricing-info-modal>.primary,.fare-proposal-modal>.primary{width:100%;margin-top:16px}
+.proposal-kicker{display:block;color:#a0783f!important;font-size:9px!important;letter-spacing:1.3px;font-weight:800;margin-bottom:4px}
+.proposal-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.proposal-fields label{margin:0}
+.proposal-fields label>span{display:block;font-size:11px;font-weight:800;color:#283741;margin-bottom:7px}
+.price-input{display:flex;align-items:center;border:1px solid #dbe3e6;border-radius:11px;background:#fff;overflow:hidden}
+.price-input input{border:0!important;border-radius:0!important;font-size:22px;font-weight:800;padding:13px 10px!important;min-width:0}
+.price-input b{padding:0 13px;color:#9b7139;font-size:18px}
+.proposal-note{display:block;text-align:center;margin-top:10px;color:#849098!important;font-size:10px!important}
+@media(max-width:800px){
+ .driver-pricing-card{padding:16px;border-radius:16px;margin-bottom:16px}
+ .driver-pricing-head h2{font-size:21px}
+ .driver-pricing-head p{font-size:11px}
+ .driver-fare-grid{grid-template-columns:1fr;gap:9px;margin:14px 0}
+ .driver-fare-item{padding:12px 13px}
+ .driver-fare-item b{font-size:23px}
+ .driver-pricing-actions{display:grid;grid-template-columns:1fr}
+ .driver-pricing-actions .outline,.driver-pricing-actions .primary{width:100%}
+ .proposal-fields{grid-template-columns:1fr}
+}
