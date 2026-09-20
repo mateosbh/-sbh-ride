@@ -5,11 +5,11 @@ export const initialPlaces: Place[] = [
  {id:'stjean',name:'Plage de Saint-Jean',description:'Baie de Saint-Jean',lat:17.9023,lng:-62.8376,category:'Plage'},
  {id:'saline',name:'Plage de Saline',description:'Anse de Grande Saline',lat:17.8846,lng:-62.8234,category:'Plage'},
  {id:'colombier',name:'Plage de Colombier',description:'Anse de Colombier',lat:17.9265,lng:-62.8697,category:'Plage'},
- {id:'eden',name:'Eden Rock',description:'Hôtel, Baie de Saint-Jean',lat:17.9032,lng:-62.8352,category:'Hôtel'},
- {id:'manapany',name:'Hôtel Manapany',description:'Anse des Cayes — hôtel',lat:17.9107,lng:-62.8521,category:'Hôtel'},
- {id:'cheval',name:'Cheval Blanc',description:'Hôtel, Baie des Flamands',lat:17.9182,lng:-62.8582,category:'Hôtel'},
- {id:'bonito',name:'Bonito Saint Barth',description:'Restaurant, Gustavia',lat:17.8953,lng:-62.8504,category:'Restaurant'},
- {id:'tamarin',name:'Tamarin',description:'Restaurant, Grande Saline',lat:17.8905,lng:-62.8247,category:'Restaurant'},
+ {id:'eden',name:'Eden Rock',description:'Hôtel, Baie de Saint-Jean',lat:17.90332,lng:-62.83605,category:'Hôtel'},
+ {id:'manapany',name:'Hôtel Manapany',description:'Anse des Cayes — hôtel',lat:17.912037,lng:-62.844526,category:'Hôtel'},
+ {id:'cheval',name:'Cheval Blanc',description:'Hôtel, Baie des Flamands',lat:17.91914,lng:-62.85449,category:'Hôtel'},
+ {id:'bonito',name:'Bonito Saint Barth',description:'Restaurant, Gustavia',lat:17.895588,lng:-62.847512,category:'Restaurant'},
+ {id:'tamarin',name:'Tamarin',description:'Restaurant, Grande Saline',lat:17.89505,lng:-62.82779,category:'Restaurant'},
  {id:'lorient',name:'Lorient',description:'Village et plage',lat:17.9066,lng:-62.8196,category:'Quartier'},
  {id:'villa',name:'Villa Palm Springs',description:'Pointe Milou — villa privée',lat:17.9182,lng:-62.8075,category:'Villa'}
 ]
