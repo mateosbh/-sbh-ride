@@ -1,9 +1,9 @@
 import { MapPin, Navigation, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Place, PlaceCategory } from '../types'
 
 type OSMResult={place_id:number;display_name:string;name?:string;lat:string;lon:string;type?:string;class?:string;namedetails?:Record<string,string>;address?:Record<string,string>}
-const cache=new Map<string,Place[]>()
+const cache=new Map<string,Place[]>();let catalogCache:Place[]|null=null
 const SBH_BOX='-62.891,17.873,-62.779,17.974'
 const OVERPASS='https://overpass-api.de/api/interpreter'
 
@@ -26,6 +26,12 @@ function mapResult(r:OSMResult,q:string):Place{
  const name=(r.namedetails?.['name:fr']||r.namedetails?.name||r.name||r.display_name.split(',')[0]||q).trim()
  return{id:`osm-${r.place_id}`,name,description:description(r,name),lat:Number(r.lat),lng:Number(r.lon),category:categoryFor(r)}
 }
+async function loadCatalog(){
+ if(catalogCache)return catalogCache
+ const body='[out:json][timeout:20];(nwr["name"]["tourism"](17.873,-62.891,17.974,-62.779);nwr["name"]["amenity"](17.873,-62.891,17.974,-62.779);nwr["name"]["shop"](17.873,-62.891,17.974,-62.779);nwr["name"]["place"](17.873,-62.891,17.974,-62.779);nwr["name"]["building"](17.873,-62.891,17.974,-62.779););out center tags 800;'
+ const res=await fetch(OVERPASS,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(body)});if(!res.ok)return[]
+ const d=await res.json();catalogCache=(d.elements||[]).map((e:any)=>{const t=e.tags||{},lat=e.lat??e.center?.lat,lng=e.lon??e.center?.lon,kind=(t.tourism||t.amenity||t.building||t.place||'').toLowerCase();const category:PlaceCategory=t.tourism==='hotel'||t.tourism==='guest_house'||t.tourism==='resort'?'Hôtel':['restaurant','cafe','bar','fast_food','pub'].includes(t.amenity)?'Restaurant':kind.includes('villa')||t.building==='house'?'Villa':['suburb','neighbourhood','quarter','hamlet','village'].includes(t.place)?'Quartier':t.natural==='beach'?'Plage':'Lieu important';return{id:`catalog-${e.type}-${e.id}`,name:t['name:fr']||t.name,description:[t['addr:housenumber'],t['addr:street'],t['addr:place'],t.tourism,t.amenity,t.shop].filter(Boolean).join(' · ')||'Saint-Barthélemy',lat:Number(lat),lng:Number(lng),category}}).filter((p:Place)=>p.name&&Number.isFinite(p.lat)&&Number.isFinite(p.lng));return catalogCache
+}
 async function overpass(q:string){
  const safe=q.replace(/["\\]/g,' ').trim();if(!safe)return[] as Place[]
  const body=`[out:json][timeout:12];(nwr["name"~"${safe}",i](17.873,-62.891,17.974,-62.779););out center tags 40;`
@@ -41,8 +47,8 @@ async function nominatim(q:string,limit='20'){
 }
 
 export default function PlacePicker({label,value,places,onChange,type}:{label:string;value?:Place;places:Place[];onChange:(p:Place)=>void;type:'from'|'to'}){
- const[open,setOpen]=useState(false),[query,setQuery]=useState(''),[online,setOnline]=useState<Place[]>([]),[loading,setLoading]=useState(false),[searched,setSearched]=useState(false),[error,setError]=useState('')
- const local=useMemo(()=>{const q=query.toLowerCase().trim();return q?places.filter(p=>(p.name+' '+p.description+' '+p.category).toLowerCase().includes(q)).slice(0,8):places.slice(0,6)},[places,query])
+ const[open,setOpen]=useState(false),[query,setQuery]=useState(''),[online,setOnline]=useState<Place[]>([]),[catalog,setCatalog]=useState<Place[]>([]),[loading,setLoading]=useState(false),[searched,setSearched]=useState(false),[error,setError]=useState('');useEffect(()=>{loadCatalog().then(setCatalog).catch(()=>{})},[])
+ const local=useMemo(()=>{const q=query.toLowerCase().trim();return q?[...places,...catalog].filter(p=>(p.name+' '+p.description+' '+p.category).toLowerCase().includes(q)).slice(0,12):[...places,...catalog].slice(0,12)},[places,catalog,query])
  const results=useMemo(()=>{const seen=new Set<string>();return[...local,...online].filter(p=>{const k=p.name.toLowerCase()+'|'+p.lat.toFixed(4)+'|'+p.lng.toFixed(4);if(seen.has(k))return false;seen.add(k);return true}).slice(0,20)},[local,online])
 
  async function searchOnline(){
@@ -69,13 +75,13 @@ export default function PlacePicker({label,value,places,onChange,type}:{label:st
   <button className="place-input" onClick={()=>setOpen(!open)}><span className={`place-dot ${type}`}>{type==='from'?<Navigation/>:<MapPin/>}</span><span><b>{value?.name||'Choisir un lieu'}</b><small>{value?.description||'Rechercher partout à Saint-Barth'}</small></span><span className="edit">Modifier</span></button>
   {open&&<div className="dropdown">
    <form onSubmit={e=>{e.preventDefault();searchOnline()}} style={{display:'flex',gap:8}}><input autoFocus placeholder="Villa, adresse, rue, resto, hôtel…" value={query} onChange={e=>{setQuery(e.target.value);setOnline([]);setSearched(false);setError('')}}/><button type="submit" aria-label="Rechercher"><Search/></button></form>
-   {query&&local.length>0&&<small style={{padding:'8px 12px',display:'block'}}>Lieux SBH enregistrés</small>}
+   {query&&local.length>0&&<small style={{padding:'8px 12px',display:'block'}}>Lieux et établissements SBH</small>}
    {results.map(p=><button key={p.id} onClick={()=>select(p)}><MapPin/><span><b>{p.name}</b><small>{p.category} · {p.description}</small></span></button>)}
    {loading&&<small style={{padding:12,display:'block'}}>Recherche des adresses et lieux de Saint-Barth…</small>}
    {!loading&&query.length>=2&&!searched&&<button onClick={searchOnline}><Search/><span><b>Rechercher “{query}” partout à Saint-Barth</b><small>Adresses · rues · quartiers · villas · hôtels · restaurants · commerces</small></span></button>}
    {!loading&&searched&&online.length===0&&!error&&<small style={{padding:12,display:'block'}}>Aucun lieu public correspondant trouvé. Ajoute-le dans SBH Places s’il s’agit d’une villa privée.</small>}
    {error&&<small style={{padding:12,display:'block'}}>{error}</small>}
-   <small style={{padding:'8px 12px 12px',display:'block',opacity:.65}}>Recherche cartographique © OpenStreetMap contributors</small>
+   <small style={{padding:'8px 12px 12px',display:'block',opacity:.65}}>Recherche étendue Saint-Barth · OpenStreetMap / Overpass</small>
   </div>}
  </div>
 }
