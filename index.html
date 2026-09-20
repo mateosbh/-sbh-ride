@@ -1,4 +1,20 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/><meta name="theme-color" content="#102a43"/><meta name="description" content="SBH Ride — votre chauffeur à Saint-Barthélemy"/><title>SBH Ride</title>  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.svg" />
+<html lang="fr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="theme-color" content="#102a43"/><meta name="description" content="SBH Ride — votre chauffeur à Saint-Barthélemy"/><title>SBH Ride</title>  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.svg" />
   <meta name="apple-mobile-web-app-title" content="SBH Ride" />
-</head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>
+<script>
+(function(){
+  var BUILD='2026-09-20-0700';
+  try{
+    var seen=localStorage.getItem('sbh-app-build');
+    var url=new URL(location.href);
+    if(seen!==BUILD){
+      localStorage.setItem('sbh-app-build',BUILD);
+      if(url.searchParams.get('build')!==BUILD){
+        url.searchParams.set('build',BUILD);
+        location.replace(url.toString());
+        return;
+      }
+    }
+  }catch(e){}
+})();
+</script></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>
