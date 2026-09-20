@@ -71,3 +71,16 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
 .vehicle-choice strong{grid-column:2;font-size:19px;line-height:1;color:#101820;margin-top:5px}
 .price-note{grid-column:1/-1;color:#7d878d;font-size:11px;line-height:1.4;margin:1px 3px 4px}
 @media(max-width:520px){.vehicle-choices{grid-template-columns:1fr;gap:9px}.vehicle-choice{min-height:78px;grid-template-columns:46px 1fr auto;grid-template-rows:1fr;padding:12px 14px}.vehicle-choice>svg{grid-row:1;grid-column:1}.vehicle-choice>span{grid-column:2}.vehicle-choice strong{grid-column:3;grid-row:1;font-size:19px;margin:0 0 0 8px;white-space:nowrap}.price-note{grid-column:1}}
+
+/* Vehicle selector v2 — large tap targets */
+.vehicle-choices{display:flex;flex-direction:column;gap:11px;margin:18px 0 10px}
+.vehicle-choice{width:100%;min-height:92px!important;display:grid!important;grid-template-columns:56px minmax(0,1fr) auto!important;grid-template-rows:1fr!important;gap:13px!important;padding:14px 16px!important;border:2px solid #e5e2dc!important;border-radius:18px!important;background:#fff!important}
+.vehicle-choice>svg{grid-column:1!important;grid-row:1!important;width:30px!important;height:30px!important;padding:10px!important;background:#f5f1e9!important}
+.vehicle-choice>span{grid-column:2!important;grid-row:1!important;align-self:center!important;gap:6px!important}
+.vehicle-choice b{font-size:18px!important;font-weight:800!important}
+.vehicle-choice small{font-size:12px!important;line-height:1.35!important}
+.vehicle-choice strong{grid-column:3!important;grid-row:1!important;align-self:center!important;font-size:22px!important;font-weight:800!important;margin:0!important;white-space:nowrap}
+.vehicle-choice.selected{border-color:#101820!important;background:#faf9f6!important;box-shadow:0 0 0 1px #101820,0 8px 24px rgba(16,24,32,.09)!important}
+.vehicle-choice.selected:after{content:"✓";position:absolute;right:10px;top:8px;width:19px;height:19px;border-radius:50%;background:#101820;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:900}
+.price-note{font-size:12px!important;margin:2px 3px 5px!important}
+@media(max-width:520px){.vehicle-choice{grid-template-columns:52px minmax(0,1fr) auto!important;min-height:88px!important;padding:13px!important}.vehicle-choice strong{font-size:20px!important}.vehicle-choice b{font-size:17px!important}}
