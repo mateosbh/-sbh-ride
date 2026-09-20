@@ -58,3 +58,16 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
 .brand-copy b{font-family:'Playfair Display',serif;font-size:18px;letter-spacing:2.2px}
 .brand-copy small{font-family:'DM Sans',sans-serif;font-size:7px;letter-spacing:2px;color:#9b7b49;margin-top:5px;font-weight:700}
 @media(max-width:480px){.brand-mark{width:35px;height:35px!important}.brand-copy b{font-size:16px}.brand-copy small{font-size:6px;letter-spacing:1.6px}}
+
+/* Clean vehicle selector */
+.vehicle-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 8px}
+.vehicle-choice{position:relative;min-width:0;min-height:116px;padding:16px 14px;border:1.5px solid #e4e2dd;border-radius:18px;background:#fff;color:#101820;display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:11px;align-items:center;text-align:left;box-shadow:0 4px 16px rgba(16,24,32,.035);cursor:pointer;transition:.18s ease}
+.vehicle-choice:hover{border-color:#caa66b;transform:translateY(-1px)}
+.vehicle-choice.selected{border:2px solid #101820;background:#fff;box-shadow:0 8px 24px rgba(16,24,32,.10)}
+.vehicle-choice>svg{grid-row:1/3;width:28px;height:28px;padding:7px;box-sizing:content-box;border-radius:12px;background:#f4ead9;color:#9b7139}
+.vehicle-choice>span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.vehicle-choice b{font-size:16px;line-height:1.1}
+.vehicle-choice small{font-size:11px;line-height:1.3;color:#7d878d}
+.vehicle-choice strong{grid-column:2;font-size:19px;line-height:1;color:#101820;margin-top:5px}
+.price-note{grid-column:1/-1;color:#7d878d;font-size:11px;line-height:1.4;margin:1px 3px 4px}
+@media(max-width:520px){.vehicle-choices{grid-template-columns:1fr;gap:9px}.vehicle-choice{min-height:78px;grid-template-columns:46px 1fr auto;grid-template-rows:1fr;padding:12px 14px}.vehicle-choice>svg{grid-row:1;grid-column:1}.vehicle-choice>span{grid-column:2}.vehicle-choice strong{grid-column:3;grid-row:1;font-size:19px;margin:0 0 0 8px;white-space:nowrap}.price-note{grid-column:1}}
