@@ -15,9 +15,11 @@ async function snapToRoad(lat:number,lng:number){
  try{
   const r=await fetch(`https://router.project-osrm.org/nearest/v1/driving/${lng},${lat}?number=1`)
   const d=await r.json(),w=d?.waypoints?.[0]
-  if(!w?.location||typeof w.distance!=='number'||w.distance>120)return null
+  if(!w?.location||typeof w.distance!=='number'||w.distance>35)return null
   const [roadLng,roadLat]=w.location
-  return inside(roadLat,roadLng)?{lat:roadLat,lng:roadLng}:null
+  if(!inside(roadLat,roadLng))return null
+  // Reject clicks in the sea: the selected point itself must already be very close to a routable road.
+  return {lat:roadLat,lng:roadLng}
  }catch{return null}
 }
 function Clicker({onMove}:{onMove?:(lat:number,lng:number)=>void}){useMapEvents({click:async e=>{const p=await snapToRoad(e.latlng.lat,e.latlng.lng);if(p)onMove?.(p.lat,p.lng)}});return null}
@@ -37,6 +39,6 @@ export default function MapView({pickup,destination,driverProgress,onMovePickup,
    {car&&<Marker position={car} icon={carIcon}/>}
   </MapContainer>
   <div className="map-credit">OpenStreetMap{routing?' · Calcul de la route…':routeInfo?` · ${routeInfo.km.toFixed(1)} km · ${Math.round(routeInfo.min)} min`:pickup&&destination?' · Route indisponible':''}</div>
-  {onMovePickup&&<div className="map-hint">Le point A se place uniquement sur une route accessible de Saint-Barth</div>}
+  {onMovePickup&&<div className="map-hint">A uniquement sur une route de Saint-Barth</div>}
  </div>
 }
