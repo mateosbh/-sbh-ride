@@ -31,14 +31,14 @@ export default function MapView({pickup,destination,driverProgress,onMovePickup,
  const car=route.length&&driverProgress!==undefined?route[Math.min(route.length-1,Math.floor(driverProgress*(route.length-1)))]:undefined
  return <div className={`map ${compact?'compact':''}`}>
   <MapContainer center={[17.905,-62.835]} zoom={13} minZoom={13} maxZoom={19} maxBounds={SBH_BOUNDS} maxBoundsViscosity={1} inertia={false} worldCopyJump={false} zoomControl={false} attributionControl={false}>
-   <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+   <TileLayer attribution='Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community' url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"/>
    <IslandGuard/><Recenter points={points} route={route}/><Clicker onMove={activePoint==='A'?onMovePickup:onMoveDestination}/>
    {pickup&&inside(pickup.lat,pickup.lng)&&<Marker position={[pickup.lat,pickup.lng]} icon={activePoint==='A'?pickupActiveIcon:pickupIcon} draggable={!!onMovePickup} eventHandlers={{click:()=>setActivePoint('A'),dragstart:()=>setActivePoint('A'),dragend:async e=>{const p=e.target.getLatLng();const road=await snapToRoad(p.lat,p.lng);if(road){e.target.setLatLng([road.lat,road.lng]);onMovePickup?.(road.lat,road.lng)}else e.target.setLatLng([pickup.lat,pickup.lng])}}}><Tooltip>{pickup.name}</Tooltip></Marker>}
    {destination&&inside(destination.lat,destination.lng)&&<Marker position={[destination.lat,destination.lng]} icon={activePoint==='B'?destinationActiveIcon:destinationIcon} draggable={!!onMoveDestination} eventHandlers={{click:()=>setActivePoint('B'),dragstart:()=>setActivePoint('B'),dragend:async e=>{const p=e.target.getLatLng();const road=await snapToRoad(p.lat,p.lng);if(road){e.target.setLatLng([road.lat,road.lng]);onMoveDestination?.(road.lat,road.lng)}else e.target.setLatLng([destination.lat,destination.lng])}}}><Tooltip>{destination.name}</Tooltip></Marker>}
    {pickup&&destination&&route.length>1&&<Polyline positions={route} pathOptions={{color:'#173f5f',weight:5}}/>}
    {userLocation&&inside(userLocation.lat,userLocation.lng)&&<Marker position={[userLocation.lat,userLocation.lng]} icon={L.divIcon({className:'geo-pin',html:'<span></span>',iconSize:[22,22],iconAnchor:[11,11]})}><Tooltip>Votre position</Tooltip></Marker>}{car&&<Marker position={car} icon={carIcon}/>}
   </MapContainer>
-  <div className="map-credit">OpenStreetMap{routing?' · Calcul de la route…':routeInfo?` · ${routeInfo.km.toFixed(1)} km · ${Math.round(routeInfo.min)} min`:pickup&&destination?' · Route indisponible':''}</div>
+  <div className="map-credit">Satellite · Esri World Imagery{routing?' · Calcul de la route…':routeInfo?` · ${routeInfo.km.toFixed(1)} km · ${Math.round(routeInfo.min)} min`:pickup&&destination?' · Route indisponible':''}</div>
   {(onMovePickup||onMoveDestination)&&<div className="map-hint">Point actif : {activePoint} · touchez A ou B puis déplacez-le sur une route</div>}
  </div>
 }
