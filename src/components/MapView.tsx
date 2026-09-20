@@ -10,7 +10,17 @@ const inside=(lat:number,lng:number)=>SBH_BOUNDS.contains([lat,lng])
 
 function Recenter({points,route}:{points:Place[];route:[number,number][]}){const map=useMap();useEffect(()=>{const pts=route.length?route:points.map(p=>[p.lat,p.lng] as [number,number]);if(pts.length>1)map.fitBounds(L.latLngBounds(pts),{padding:[55,55],maxZoom:16});else if(pts[0])map.flyTo(pts[0],16)},[map,points,route]);return null}
 function IslandGuard(){const map=useMap();useEffect(()=>{map.setMaxBounds(SBH_BOUNDS);map.setMinZoom(13);const keep=()=>{if(!SBH_BOUNDS.contains(map.getCenter()))map.panInsideBounds(SBH_BOUNDS,{animate:false})};map.on('drag',keep);map.on('moveend',keep);return()=>{map.off('drag',keep);map.off('moveend',keep)}},[map]);return null}
-function Clicker({onMove}:{onMove?:(lat:number,lng:number)=>void}){useMapEvents({click:e=>{if(inside(e.latlng.lat,e.latlng.lng))onMove?.(e.latlng.lat,e.latlng.lng)}});return null}
+async function snapToRoad(lat:number,lng:number){
+ if(!inside(lat,lng))return null
+ try{
+  const r=await fetch(`https://router.project-osrm.org/nearest/v1/driving/${lng},${lat}?number=1`)
+  const d=await r.json(),w=d?.waypoints?.[0]
+  if(!w?.location||typeof w.distance!=='number'||w.distance>120)return null
+  const [roadLng,roadLat]=w.location
+  return inside(roadLat,roadLng)?{lat:roadLat,lng:roadLng}:null
+ }catch{return null}
+}
+function Clicker({onMove}:{onMove?:(lat:number,lng:number)=>void}){useMapEvents({click:async e=>{const p=await snapToRoad(e.latlng.lat,e.latlng.lng);if(p)onMove?.(p.lat,p.lng)}});return null}
 
 export default function MapView({pickup,destination,driverProgress,onMovePickup,compact=false}:{pickup?:Place;destination?:Place;driverProgress?:number;onMovePickup?:(lat:number,lng:number)=>void;compact?:boolean}){
  const points=useMemo(()=>[pickup,destination].filter(Boolean) as Place[],[pickup,destination])
@@ -21,12 +31,12 @@ export default function MapView({pickup,destination,driverProgress,onMovePickup,
   <MapContainer center={[17.905,-62.835]} zoom={13} minZoom={13} maxZoom={19} maxBounds={SBH_BOUNDS} maxBoundsViscosity={1} inertia={false} worldCopyJump={false} zoomControl={false} attributionControl={false}>
    <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
    <IslandGuard/><Recenter points={points} route={route}/><Clicker onMove={onMovePickup}/>
-   {pickup&&inside(pickup.lat,pickup.lng)&&<Marker position={[pickup.lat,pickup.lng]} icon={pickupIcon} draggable={!!onMovePickup} eventHandlers={{dragend:e=>{const p=e.target.getLatLng();if(inside(p.lat,p.lng))onMovePickup?.(p.lat,p.lng);else e.target.setLatLng([pickup.lat,pickup.lng])}}}><Tooltip>{pickup.name}</Tooltip></Marker>}
+   {pickup&&inside(pickup.lat,pickup.lng)&&<Marker position={[pickup.lat,pickup.lng]} icon={pickupIcon} draggable={!!onMovePickup} eventHandlers={{dragend:async e=>{const p=e.target.getLatLng();const road=await snapToRoad(p.lat,p.lng);if(road){e.target.setLatLng([road.lat,road.lng]);onMovePickup?.(road.lat,road.lng)}else e.target.setLatLng([pickup.lat,pickup.lng])}}}><Tooltip>{pickup.name}</Tooltip></Marker>}
    {destination&&inside(destination.lat,destination.lng)&&<Marker position={[destination.lat,destination.lng]} icon={destinationIcon}><Tooltip>{destination.name}</Tooltip></Marker>}
    {pickup&&destination&&route.length>1&&<Polyline positions={route} pathOptions={{color:'#173f5f',weight:5}}/>}
    {car&&<Marker position={car} icon={carIcon}/>}
   </MapContainer>
   <div className="map-credit">OpenStreetMap{routing?' · Calcul de la route…':routeInfo?` · ${routeInfo.km.toFixed(1)} km · ${Math.round(routeInfo.min)} min`:pickup&&destination?' · Route indisponible':''}</div>
-  {onMovePickup&&<div className="map-hint">Carte et points limités à Saint-Barth</div>}
+  {onMovePickup&&<div className="map-hint">Le point A se place uniquement sur une route accessible de Saint-Barth</div>}
  </div>
 }
