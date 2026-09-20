@@ -15,7 +15,7 @@ async function snapToRoad(lat:number,lng:number){
  try{
   const r=await fetch(`https://router.project-osrm.org/nearest/v1/driving/${lng},${lat}?number=1`)
   const d=await r.json(),w=d?.waypoints?.[0]
-  if(!w?.location||typeof w.distance!=='number'||w.distance>35)return null
+  if(!w?.location||typeof w.distance!=='number'||w.distance>18)return null
   const [roadLng,roadLat]=w.location
   if(!inside(roadLat,roadLng))return null
   // Reject clicks in the sea: the selected point itself must already be very close to a routable road.
