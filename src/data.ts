@@ -6,6 +6,7 @@ export const initialPlaces: Place[] = [
  {id:'saline',name:'Plage de Saline',description:'Anse de Grande Saline',lat:17.8846,lng:-62.8234,category:'Plage'},
  {id:'colombier',name:'Plage de Colombier',description:'Anse de Colombier',lat:17.9265,lng:-62.8697,category:'Plage'},
  {id:'eden',name:'Eden Rock',description:'Hôtel, Baie de Saint-Jean',lat:17.9032,lng:-62.8352,category:'Hôtel'},
+ {id:'manapany',name:'Hôtel Manapany',description:'Anse des Cayes — hôtel',lat:17.9107,lng:-62.8521,category:'Hôtel'},
  {id:'cheval',name:'Cheval Blanc',description:'Hôtel, Baie des Flamands',lat:17.9182,lng:-62.8582,category:'Hôtel'},
  {id:'bonito',name:'Bonito Saint Barth',description:'Restaurant, Gustavia',lat:17.8953,lng:-62.8504,category:'Restaurant'},
  {id:'tamarin',name:'Tamarin',description:'Restaurant, Grande Saline',lat:17.8905,lng:-62.8247,category:'Restaurant'},
