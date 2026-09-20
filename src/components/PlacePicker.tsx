@@ -5,6 +5,7 @@ import type { Place, PlaceCategory } from '../types'
 type OSMResult={place_id:number;display_name:string;name?:string;lat:string;lon:string;type?:string;class?:string;namedetails?:Record<string,string>;address?:Record<string,string>}
 const cache=new Map<string,Place[]>()
 const SBH_BOX='-62.891,17.873,-62.779,17.974'
+const OVERPASS='https://overpass-api.de/api/interpreter'
 
 function categoryFor(r:OSMResult):PlaceCategory{
  const t=(r.type||'').toLowerCase(),c=(r.class||'').toLowerCase()
@@ -24,6 +25,13 @@ function description(r:OSMResult,name:string){
 function mapResult(r:OSMResult,q:string):Place{
  const name=(r.namedetails?.['name:fr']||r.namedetails?.name||r.name||r.display_name.split(',')[0]||q).trim()
  return{id:`osm-${r.place_id}`,name,description:description(r,name),lat:Number(r.lat),lng:Number(r.lon),category:categoryFor(r)}
+}
+async function overpass(q:string){
+ const safe=q.replace(/["\\]/g,' ').trim();if(!safe)return[] as Place[]
+ const body=`[out:json][timeout:12];(nwr["name"~"${safe}",i](17.873,-62.891,17.974,-62.779););out center tags 40;`
+ const res=await fetch(OVERPASS,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(body)})
+ if(!res.ok)return[] as Place[];const d=await res.json()
+ return (d.elements||[]).map((e:any)=>{const lat=e.lat??e.center?.lat,lng=e.lon??e.center?.lon,t=e.tags||{},kind=(t.tourism||t.amenity||t.building||t.place||'').toLowerCase();const category:PlaceCategory=t.tourism==='hotel'||t.tourism==='guest_house'||t.tourism==='resort'?'Hôtel':['restaurant','cafe','bar','fast_food','pub'].includes(t.amenity)?'Restaurant':kind.includes('villa')||t.building==='house'?'Villa':['suburb','neighbourhood','quarter','hamlet','village'].includes(t.place)?'Quartier':t.natural==='beach'?'Plage':'Lieu important';return{id:`osm-full-${e.type}-${e.id}`,name:t['name:fr']||t.name||safe,description:[t['addr:housenumber'],t['addr:street'],t['addr:place'],t.place].filter(Boolean).join(' · ')||'Saint-Barthélemy',lat:Number(lat),lng:Number(lng),category}}).filter((p:Place)=>Number.isFinite(p.lat)&&Number.isFinite(p.lng))
 }
 async function nominatim(q:string,limit='20'){
  const params=new URLSearchParams({q,format:'jsonv2',addressdetails:'1',namedetails:'1',limit,countrycodes:'bl',viewbox:SBH_BOX,bounded:'1',layer:'address,poi'})
@@ -45,12 +53,13 @@ export default function PlacePicker({label,value,places,onChange,type}:{label:st
   try{
    // Deliberately submit-only: public Nominatim forbids client-side autocomplete.
    // Try exact SBH query first, then a broader spelling/POI query if necessary.
+   const rich=await overpass(q)
    let data=await nominatim(q)
    if(data.length<5){
     const more=await nominatim(`${q}, Saint-Barthélemy`)
     const ids=new Set(data.map(x=>x.place_id));data=[...data,...more.filter(x=>!ids.has(x.place_id))]
    }
-   const mapped=data.map(r=>mapResult(r,q)).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&p.lat>=17.873&&p.lat<=17.974&&p.lng>=-62.891&&p.lng<=-62.779)
+   const mapped=[...rich,...data.map(r=>mapResult(r,q))].filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&p.lat>=17.873&&p.lat<=17.974&&p.lng>=-62.891&&p.lng<=-62.779)
    cache.set(key,mapped);setOnline(mapped)
   }catch{setError('Recherche en ligne indisponible. Réessayez.');setOnline([])}
   finally{setLoading(false)}
