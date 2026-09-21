@@ -290,3 +290,18 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
  .help-page{padding:18px 12px 40px}.help-hero{padding:20px}.help-hero h1{font-size:27px}.help-hero>svg{width:36px;height:36px}
  .help-grid{grid-template-columns:1fr}.support-admin-row{flex-direction:column}.support-admin-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.support-admin-actions button{width:100%}
 }
+
+
+/* Smoother mobile dragging for A/B map pins */
+.custom-pin{background:none!important;border:none!important;width:48px!important;height:56px!important;display:flex!important;align-items:flex-start;justify-content:center;touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}
+.custom-pin:active,.custom-pin.active{cursor:grabbing}
+.custom-pin span{display:flex;width:36px;height:36px;border-radius:50% 50% 50% 5px;transform:rotate(-45deg);color:#fff;border:3px solid #fff;box-shadow:0 4px 16px rgba(16,42,67,.4);align-items:center;justify-content:center;font-weight:800;transition:transform .14s ease,box-shadow .14s ease}
+.custom-pin span b{transform:rotate(45deg);font-size:13px;line-height:1}
+.custom-pin.active span{transform:rotate(-45deg) scale(1.12);box-shadow:0 6px 22px rgba(22,139,242,.42)}
+.marker-dragging .leaflet-container{cursor:grabbing!important}
+.marker-dragging .custom-pin span{transform:rotate(-45deg) scale(1.18);box-shadow:0 8px 26px rgba(16,42,67,.45)}
+.map-hint.dragging{background:rgba(16,42,67,.94);color:#fff;border-color:transparent;box-shadow:0 8px 24px rgba(16,42,67,.2)}
+@media(max-width:800px){
+ .custom-pin{width:54px!important;height:62px!important;margin-left:-3px!important;margin-top:-3px!important}
+ .custom-pin span{width:38px;height:38px}
+}
