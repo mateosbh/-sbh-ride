@@ -260,3 +260,15 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
  .admin-cancel-policy>div:last-child{width:100%;display:grid;grid-template-columns:1fr 1fr}
  .admin-cancel-policy button{width:100%}
 }
+
+
+/* Named cancellation ledger */
+.named-cancel-policy{align-items:flex-start}
+.cancel-ledger{display:grid!important;gap:8px!important;min-width:310px}
+.cancel-person{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px;border:1px solid #e8ecee;border-radius:10px;background:#fafbfb}
+.cancel-person span{display:flex;flex-direction:column;gap:2px}.cancel-person b{font-size:11px;color:#24333d}.cancel-person small{font-size:9px;color:#7b8990}
+.cancel-person .outline{min-height:32px;padding:6px 9px;font-size:9px}
+@media(max-width:800px){
+ .cancel-ledger{min-width:0;width:100%}
+ .cancel-person{align-items:flex-start}
+}
