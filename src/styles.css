@@ -219,3 +219,22 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
  .scheduled-driver-row{grid-template-columns:62px 1fr;align-items:start}.scheduled-driver-row>.primary,.scheduled-taken{grid-column:1/-1;width:100%;justify-content:center}
  .admin-scheduled-row{grid-template-columns:1fr;gap:5px}.admin-scheduled-row em{justify-self:start}
 }
+
+
+/* Scheduled booking reassurance */
+.schedule-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px}
+.schedule-benefits>div{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid #ece8e0;border-radius:12px;background:#fbfaf7}
+.schedule-benefits svg{width:17px;height:17px;color:#b18442;flex:0 0 auto;margin-top:1px}
+.schedule-benefits span{display:flex;flex-direction:column;gap:2px}
+.schedule-benefits b{font-size:10px;color:#24333d}
+.schedule-benefits small{font-size:8px;line-height:1.35;color:#7f8b91}
+.schedule-policy{display:flex;gap:11px;align-items:flex-start;margin:12px 0 14px;padding:12px 13px;border-radius:12px;background:#fff7e9;border:1px solid #ecd9b8}
+.schedule-policy>svg{width:18px;color:#a56e1d;flex:0 0 auto;margin-top:2px}
+.schedule-policy>div{display:flex;flex-direction:column;gap:3px}
+.schedule-policy b{font-size:11px;color:#68491c}
+.schedule-policy small{font-size:9px;line-height:1.45;color:#846b48}
+@media(max-width:800px){
+ .schedule-benefits{grid-template-columns:1fr}
+ .schedule-benefits>div{padding:9px 10px}
+ .schedule-benefits small{font-size:9px}
+}
