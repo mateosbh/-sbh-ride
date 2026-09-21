@@ -238,3 +238,25 @@ nav{background:#f5f4f1}nav button{color:#73777a}nav button.active{color:var(--in
  .schedule-benefits>div{padding:9px 10px}
  .schedule-benefits small{font-size:9px}
 }
+
+
+/* Scheduled ride cancellation rules */
+.scheduled-client-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.cancel-window{font-size:8px;color:#8b969c}
+.scheduled-cancel-btn{border:0;background:transparent;color:#a15f52;font-size:9px;font-weight:800;padding:2px 0;cursor:pointer}
+.scheduled-taken-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.schedule-rules,.driver-cancel-policy{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border-radius:12px;background:#f4f7f8;border:1px solid #dfe6e9}
+.schedule-rules{margin:0 0 14px}.schedule-rules>svg,.driver-cancel-policy>svg{width:18px;color:#527184;flex:0 0 auto;margin-top:2px}
+.schedule-rules>div,.driver-cancel-policy span{display:flex;flex-direction:column;gap:3px}
+.schedule-rules b,.driver-cancel-policy b{font-size:11px;color:#29404f}.schedule-rules small,.driver-cancel-policy small{font-size:9px;line-height:1.45;color:#75868f}
+.driver-cancel-policy{margin:-7px 0 18px}
+.admin-cancel-policy{display:flex;justify-content:space-between;gap:18px;align-items:center;background:#fff;border:1px solid #e2e8ea;border-radius:12px;padding:16px 18px;margin-bottom:17px}
+.admin-cancel-policy small{font-size:8px;letter-spacing:1.2px;color:#a07b43;font-weight:800}.admin-cancel-policy h3{font-size:14px;margin:4px 0}.admin-cancel-policy p{font-size:10px;color:#7a8992;margin:0}
+.admin-cancel-policy>div:last-child{display:flex;gap:8px}.admin-cancel-policy .outline{white-space:nowrap}
+.admin-scheduled-row em.cancelled{background:#f2e7e5;color:#9b5a50}
+@media(max-width:800px){
+ .scheduled-client-side,.scheduled-taken-wrap{align-items:flex-start}
+ .admin-cancel-policy{align-items:flex-start;flex-direction:column}
+ .admin-cancel-policy>div:last-child{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .admin-cancel-policy button{width:100%}
+}
