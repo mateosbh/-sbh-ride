@@ -124,7 +124,7 @@ const EXTRA_TRANSLATIONS:Record<Exclude<Lang,'fr'>,Record<string,string>>={
 en:{
 'Prêt à commander':'Ready to book','Recherche de votre chauffeur':'Finding your driver','Chauffeur confirmé':'Driver confirmed','Vous êtes arrivé':'You have arrived',
 'Commander maintenant':'Book now','Programmer une course':'Schedule a ride','Réserver pour un jour et une heure précis':'Book for a specific date and time',
-'Horaire garanti':'Scheduled time','Votre course est réservée à l’avance.':'Your ride is booked in advance.','Chauffeur confirmé':'Driver confirmed','Un chauffeur accepte la course avant le départ.':'A driver accepts the ride before departure.',
+'Horaire garanti':'Scheduled time','Votre course est réservée à l’avance.':'Your ride is booked in advance.','Un chauffeur accepte la course avant le départ.':'A driver accepts the ride before departure.',
 '10 min d’attente incluses':'10 min waiting included','Passé 10 min après l’heure prévue, le chauffeur peut partir et le montant de la course peut être encaissé.':'After 10 minutes past the scheduled time, the driver may leave and the ride may be charged.',
 'Mes courses programmées':'My scheduled rides','En attente chauffeur':'Waiting for a driver','Confirmée · ':'Confirmed · ','RÉSERVATION À L’AVANCE':'ADVANCE BOOKING','Programmer votre course':'Schedule your ride',
 'La demande sera proposée aux chauffeurs. Le premier qui l’accepte vous sera attribué.':'The request will be offered to drivers. The first to accept will be assigned to you.',
