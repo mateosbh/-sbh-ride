@@ -4,6 +4,7 @@ import type { Place, PlaceCategory } from '../types'
 
 type OSMResult={place_id:number;display_name:string;name?:string;lat:string;lon:string;type?:string;class?:string;namedetails?:Record<string,string>;address?:Record<string,string>}
 const cache=new Map<string,Place[]>();let catalogCache:Place[]|null=null
+const currentLang=()=>document.documentElement.lang||'fr'
 const SBH_BOX='-62.891,17.873,-62.779,17.974'
 const OVERPASS='https://overpass-api.de/api/interpreter'
 
@@ -23,25 +24,25 @@ function description(r:OSMResult,name:string){
  return r.display_name.split(',').map(x=>x.trim()).filter(x=>x&&x.toLowerCase()!==name.toLowerCase()).slice(0,3).join(' · ')||'Saint-Barthélemy'
 }
 function mapResult(r:OSMResult,q:string):Place{
- const name=(r.namedetails?.['name:fr']||r.namedetails?.name||r.name||r.display_name.split(',')[0]||q).trim()
+ const lang=currentLang(); const name=(r.namedetails?.['name:'+lang]||r.namedetails?.['name:fr']||r.namedetails?.name||r.name||r.display_name.split(',')[0]||q).trim()
  return{id:`osm-${r.place_id}`,name,description:description(r,name),lat:Number(r.lat),lng:Number(r.lon),category:categoryFor(r)}
 }
 async function loadCatalog(){
  if(catalogCache)return catalogCache
  const body='[out:json][timeout:25];(nwr["name"]["tourism"](17.873,-62.891,17.974,-62.779);nwr["name"]["amenity"](17.873,-62.891,17.974,-62.779);nwr["name"]["shop"](17.873,-62.891,17.974,-62.779);nwr["name"]["place"](17.873,-62.891,17.974,-62.779);nwr["name"]["building"](17.873,-62.891,17.974,-62.779);nwr["name"]["highway"](17.873,-62.891,17.974,-62.779);nwr["name"]["natural"="beach"](17.873,-62.891,17.974,-62.779);nwr["name"]["leisure"](17.873,-62.891,17.974,-62.779);nwr["name"]["office"](17.873,-62.891,17.974,-62.779);nwr["name"]["craft"](17.873,-62.891,17.974,-62.779);nwr["name"]["healthcare"](17.873,-62.891,17.974,-62.779);nwr["name"]["aeroway"](17.873,-62.891,17.974,-62.779);nwr["name"]["public_transport"](17.873,-62.891,17.974,-62.779);nwr["name"]["historic"](17.873,-62.891,17.974,-62.779);nwr["name"]["man_made"](17.873,-62.891,17.974,-62.779););out center tags 3000;'
  const res=await fetch(OVERPASS,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(body)});if(!res.ok)return[]
- const d=await res.json();catalogCache=(d.elements||[]).map((e:any)=>{const t=e.tags||{},lat=e.lat??e.center?.lat,lng=e.lon??e.center?.lon,kind=(t.tourism||t.amenity||t.building||t.place||'').toLowerCase();const category:PlaceCategory=t.tourism==='hotel'||t.tourism==='guest_house'||t.tourism==='resort'?'Hôtel':['restaurant','cafe','bar','fast_food','pub'].includes(t.amenity)?'Restaurant':kind.includes('villa')||t.building==='house'?'Villa':['suburb','neighbourhood','quarter','hamlet','village'].includes(t.place)||Boolean(t.highway)?'Quartier':t.natural==='beach'?'Plage':'Lieu important';return{id:`catalog-${e.type}-${e.id}`,name:t['name:fr']||t.name,description:[t['addr:housenumber'],t['addr:street'],t['addr:place'],t.highway?'Route / rue':undefined,t.tourism,t.amenity,t.shop,t.leisure].filter(Boolean).join(' · ')||'Saint-Barthélemy',lat:Number(lat),lng:Number(lng),category}}).filter((p:Place)=>p.name&&Number.isFinite(p.lat)&&Number.isFinite(p.lng));return catalogCache || []
+ const d=await res.json();catalogCache=(d.elements||[]).map((e:any)=>{const t=e.tags||{},lat=e.lat??e.center?.lat,lng=e.lon??e.center?.lon,kind=(t.tourism||t.amenity||t.building||t.place||'').toLowerCase();const category:PlaceCategory=t.tourism==='hotel'||t.tourism==='guest_house'||t.tourism==='resort'?'Hôtel':['restaurant','cafe','bar','fast_food','pub'].includes(t.amenity)?'Restaurant':kind.includes('villa')||t.building==='house'?'Villa':['suburb','neighbourhood','quarter','hamlet','village'].includes(t.place)||Boolean(t.highway)?'Quartier':t.natural==='beach'?'Plage':'Lieu important';return{id:`catalog-${e.type}-${e.id}`,name:t['name:'+currentLang()]||t['name:fr']||t.name,description:[t['addr:housenumber'],t['addr:street'],t['addr:place'],t.highway?'Route / rue':undefined,t.tourism,t.amenity,t.shop,t.leisure].filter(Boolean).join(' · ')||'Saint-Barthélemy',lat:Number(lat),lng:Number(lng),category}}).filter((p:Place)=>p.name&&Number.isFinite(p.lat)&&Number.isFinite(p.lng));return catalogCache || []
 }
 async function overpass(q:string){
  const safe=q.replace(/["\\]/g,' ').trim();if(!safe)return[] as Place[]
  const body=`[out:json][timeout:12];(nwr["name"~"${safe}",i](17.873,-62.891,17.974,-62.779););out center tags 40;`
  const res=await fetch(OVERPASS,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(body)})
  if(!res.ok)return[] as Place[];const d=await res.json()
- return (d.elements||[]).map((e:any)=>{const lat=e.lat??e.center?.lat,lng=e.lon??e.center?.lon,t=e.tags||{},kind=(t.tourism||t.amenity||t.building||t.place||'').toLowerCase();const category:PlaceCategory=t.tourism==='hotel'||t.tourism==='guest_house'||t.tourism==='resort'?'Hôtel':['restaurant','cafe','bar','fast_food','pub'].includes(t.amenity)?'Restaurant':kind.includes('villa')||t.building==='house'?'Villa':['suburb','neighbourhood','quarter','hamlet','village'].includes(t.place)?'Quartier':t.natural==='beach'?'Plage':'Lieu important';return{id:`osm-full-${e.type}-${e.id}`,name:t['name:fr']||t.name||safe,description:[t['addr:housenumber'],t['addr:street'],t['addr:place'],t.place].filter(Boolean).join(' · ')||'Saint-Barthélemy',lat:Number(lat),lng:Number(lng),category}}).filter((p:Place)=>Number.isFinite(p.lat)&&Number.isFinite(p.lng))
+ return (d.elements||[]).map((e:any)=>{const lat=e.lat??e.center?.lat,lng=e.lon??e.center?.lon,t=e.tags||{},kind=(t.tourism||t.amenity||t.building||t.place||'').toLowerCase();const category:PlaceCategory=t.tourism==='hotel'||t.tourism==='guest_house'||t.tourism==='resort'?'Hôtel':['restaurant','cafe','bar','fast_food','pub'].includes(t.amenity)?'Restaurant':kind.includes('villa')||t.building==='house'?'Villa':['suburb','neighbourhood','quarter','hamlet','village'].includes(t.place)?'Quartier':t.natural==='beach'?'Plage':'Lieu important';return{id:`osm-full-${e.type}-${e.id}`,name:t['name:'+currentLang()]||t['name:fr']||t.name||safe,description:[t['addr:housenumber'],t['addr:street'],t['addr:place'],t.place].filter(Boolean).join(' · ')||'Saint-Barthélemy',lat:Number(lat),lng:Number(lng),category}}).filter((p:Place)=>Number.isFinite(p.lat)&&Number.isFinite(p.lng))
 }
 async function nominatim(q:string,limit='20'){
  const params=new URLSearchParams({q,format:'jsonv2',addressdetails:'1',namedetails:'1',limit,countrycodes:'bl',viewbox:SBH_BOX,bounded:'1',layer:'address,poi'})
- const res=await fetch(`https://nominatim.openstreetmap.org/search?${params}`,{headers:{Accept:'application/json','Accept-Language':'fr'}})
+ const res=await fetch(`https://nominatim.openstreetmap.org/search?${params}`,{headers:{Accept:'application/json','Accept-Language':currentLang()}})
  if(!res.ok)throw new Error('search')
  return await res.json() as OSMResult[]
 }
@@ -53,7 +54,7 @@ export default function PlacePicker({label,value,places,onChange,type}:{label:st
 
  async function searchOnline(){
   const q=query.trim();if(q.length<2)return
-  setError('');setSearched(true);const key=q.toLowerCase()
+  setError('');setSearched(true);const key=currentLang()+':'+q.toLowerCase()
   if(cache.has(key)){setOnline(cache.get(key)!);return}
   setLoading(true)
   try{
